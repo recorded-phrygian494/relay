@@ -1,0 +1,8 @@
+{
+  "id": "chatcmpl-9x2",
+  "object": "chat.completion",
+  "created": 1751234568,
+  "model": "gpt-4o-2024-08-06",
+  "choices": [{"index": 0, "message": {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "type": "function", "function": {"name": "get_weather", "arguments": "{\"city\":\"Dublin\"}"}}]}, "finish_reason": "tool_calls"}],
+  "usage": {"prompt_tokens": 50, "completion_tokens": 15, "total_tokens": 65}
+}

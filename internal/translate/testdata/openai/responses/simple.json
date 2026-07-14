@@ -1,0 +1,9 @@
+{
+  "id": "chatcmpl-9x1",
+  "object": "chat.completion",
+  "created": 1751234567,
+  "model": "gpt-4o-mini-2024-07-18",
+  "system_fingerprint": "fp_abc",
+  "choices": [{"index": 0, "message": {"role": "assistant", "content": "Rayleigh scattering."}, "finish_reason": "stop", "logprobs": null}],
+  "usage": {"prompt_tokens": 20, "completion_tokens": 5, "total_tokens": 25, "prompt_tokens_details": {"cached_tokens": 0}}
+}

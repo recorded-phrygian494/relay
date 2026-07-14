@@ -1,0 +1,13 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    {"role": "developer", "content": "Be safe."},
+    {"role": "user", "name": "faith", "content": "Hello"}
+  ],
+  "stop": "END",
+  "seed": 42,
+  "presence_penalty": 0.5,
+  "logit_bias": {"50256": -100},
+  "n": 2,
+  "user": "user-123"
+}
