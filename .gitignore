@@ -1,0 +1,9 @@
+/relay
+/relay.exe
+/dist/
+*.db
+*.db-wal
+*.db-shm
+relay.yaml
+!examples/**/relay.yaml
+coverage.out
