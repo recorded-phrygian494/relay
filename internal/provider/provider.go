@@ -1,0 +1,72 @@
+// Package provider defines the Provider interface every upstream adapter
+// implements, plus normalized error and model types. Adapters translate the
+// core IR to their wire format and back; they never retry, break circuits,
+// or rotate keys — that is the executor's job (DESIGN §6).
+package provider
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/relay-llm/relay/internal/core"
+)
+
+// Provider is one configured upstream.
+type Provider interface {
+	Name() string
+	Models(ctx context.Context) ([]Model, error)
+	Complete(ctx context.Context, req *core.Request) (*core.Response, error)
+	Stream(ctx context.Context, req *core.Request) (core.Stream, error)
+}
+
+// Model is one catalog entry.
+type Model struct {
+	ID       string
+	Provider string
+	Created  int64
+	OwnedBy  string
+}
+
+// Error is a normalized upstream failure. Raw preserves the provider's
+// original error body for debugging.
+type Error struct {
+	Provider   string
+	Status     int
+	Code       string
+	Message    string
+	Retryable  bool
+	RetryAfter time.Duration
+	Raw        json.RawMessage
+}
+
+// Error implements the error interface.
+func (e *Error) Error() string {
+	return fmt.Sprintf("%s: %s (status %d, code %q)", e.Provider, e.Message, e.Status, e.Code)
+}
+
+// NewError builds a normalized Error, deriving Retryable from the status
+// code: 429 and 5xx are retryable, other 4xx are not.
+func NewError(providerName string, status int, code, message string, raw []byte) *Error {
+	return &Error{
+		Provider:  providerName,
+		Status:    status,
+		Code:      code,
+		Message:   message,
+		Retryable: status == 429 || status >= 500,
+		Raw:       raw,
+	}
+}
+
+// Transport wraps a network-level failure (connect refused, timeout, EOF),
+// which is always retryable against the next candidate.
+func Transport(providerName string, err error) *Error {
+	return &Error{
+		Provider:  providerName,
+		Status:    0,
+		Code:      "transport_error",
+		Message:   err.Error(),
+		Retryable: true,
+	}
+}
