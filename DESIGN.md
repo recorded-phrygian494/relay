@@ -193,7 +193,8 @@ relay/
 │   │                           state machines. THE package with exhaustive fixture tests.
 │   ├── provider/
 │   │   ├── provider.go         Provider interface + registry + capability flags
-│   │   ├── openai/             also serves Azure OpenAI (same wire, different URL/auth shape)
+│   │   ├── openaiprov/         first-party OpenAI (named to avoid colliding with api/openai);
+│   │   │                       Azure OpenAI joins here later (same wire, different URL/auth)
 │   │   ├── anthropic/
 │   │   ├── gemini/             AI Studio + Vertex (same wire, different auth/endpoint)
 │   │   ├── openaicompat/       the escape hatch: configurable base_url; vLLM/SGLang/LM Studio/
@@ -214,13 +215,15 @@ relay/
 │   ├── dashboard/              one embedded HTML page (go:embed), server-rendered JSON + <100 lines vanilla JS
 │   └── server/                 HTTP wiring, auth middleware, SSE plumbing, graceful shutdown
 ├── assets/pricing.json         bundled pricing registry (versioned, user-overridable)
-├── testdata/fixtures/          recorded provider request/response/stream fixtures (see §6)
+│                               (fixtures live package-local, e.g. internal/translate/testdata/,
+│                               per Go convention — not in a root testdata/ tree)
 ├── DESIGN.md  README.md  LICENSE (Apache-2.0)
 └── examples/  .github/  Dockerfile  .goreleaser.yaml        (phase 5)
 ```
 
-Dependency policy: stdlib-first. Expected go.mod: `modernc.org/sqlite`, `gopkg.in/yaml.v3`,
-`fsnotify`, `prometheus/client_golang`, maybe `chi` if stdlib mux gets annoying. That's it.
+Dependency policy: stdlib-first. go.mod today: `modernc.org/sqlite`, `gopkg.in/yaml.v3`;
+`prometheus/client_golang` joins in phase 3. Hot reload is 2s mtime polling, not fsnotify —
+one fewer dependency, identical behavior at this scale, and reliable on Windows.
 
 ---
 
