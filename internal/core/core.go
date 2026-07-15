@@ -86,9 +86,15 @@ type Request struct {
 	Inbound            Dialect
 }
 
+// BlockExt carries block-level dialect-specific fields (e.g. Anthropic
+// cache_control) for same-dialect passthrough. Dropping these silently on a
+// passthrough hop would break prompt caching, so they ride the IR.
+type BlockExt map[string]json.RawMessage
+
 // SystemPart is one block of the top-level system prompt.
 type SystemPart struct {
 	Text string
+	Ext  BlockExt
 }
 
 // Message is one conversation turn.
@@ -105,6 +111,7 @@ type Part interface{ part() }
 // TextPart is plain text content.
 type TextPart struct {
 	Text string
+	Ext  BlockExt
 }
 
 // ImagePart is an image input, either by URL or inline base64 data.
@@ -113,6 +120,7 @@ type ImagePart struct {
 	MediaType string // e.g. image/png, required when Data is set
 	Data      string // base64 payload, when inline
 	Detail    string // OpenAI detail hint; same-dialect passthrough
+	Ext       BlockExt
 }
 
 // ToolCallPart is an assistant request to invoke a tool. Args is the raw
@@ -121,6 +129,7 @@ type ToolCallPart struct {
 	ID   string
 	Name string
 	Args string
+	Ext  BlockExt
 }
 
 // ToolResultPart is the caller-supplied result of a prior tool call.
@@ -128,12 +137,17 @@ type ToolResultPart struct {
 	ToolCallID string
 	Content    []Part
 	IsError    bool
+	Ext        BlockExt
 }
 
-// ThinkingPart is a model reasoning block. Passthrough-only in v1.
+// ThinkingPart is a model reasoning block. Passthrough-only in v1. Redacted
+// holds the opaque payload of a redacted_thinking block, in which case Text
+// and Signature are empty.
 type ThinkingPart struct {
 	Text      string
 	Signature string
+	Redacted  string
+	Ext       BlockExt
 }
 
 func (TextPart) part()       {}
@@ -148,6 +162,7 @@ type Tool struct {
 	Description string
 	Parameters  json.RawMessage
 	Strict      *bool // OpenAI strict mode; dropped cross-dialect
+	Ext         BlockExt
 }
 
 // ToolChoiceMode says how the model may use tools.
@@ -163,8 +178,9 @@ const (
 
 // ToolChoice constrains tool use for a request.
 type ToolChoice struct {
-	Mode ToolChoiceMode
-	Name string // set when Mode == ToolChoiceTool
+	Mode            ToolChoiceMode
+	Name            string // set when Mode == ToolChoiceTool
+	DisableParallel *bool  // Anthropic disable_parallel_tool_use passthrough
 }
 
 // ResponseFormat requests plain text, JSON mode, or schema-constrained output.
