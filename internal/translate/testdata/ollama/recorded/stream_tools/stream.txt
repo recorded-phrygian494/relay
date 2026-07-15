@@ -1,0 +1,2 @@
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:57.5681352Z","message":{"role":"assistant","content":"","tool_calls":[{"id":"call_dl3xgdhs","function":{"index":0,"name":"get_weather","arguments":{"city":"Dublin"}}}]},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:58.0260405Z","message":{"role":"assistant","content":""},"done":true,"done_reason":"stop","total_duration":5791018300,"load_duration":604898600,"prompt_eval_count":61,"prompt_eval_duration":1026913000,"eval_count":22,"eval_duration":4130380000}

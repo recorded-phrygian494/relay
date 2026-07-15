@@ -1,0 +1,6 @@
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:50.9601554Z","message":{"role":"assistant","content":"1"},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:51.2271416Z","message":{"role":"assistant","content":"2"},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:51.4350356Z","message":{"role":"assistant","content":"3"},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:51.9311582Z","message":{"role":"assistant","content":"4"},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:52.0656496Z","message":{"role":"assistant","content":"5"},"done":false}
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:52.231479Z","message":{"role":"assistant","content":""},"done":true,"done_reason":"stop","total_duration":4728427200,"load_duration":1380164500,"prompt_eval_count":14,"prompt_eval_duration":2014561000,"eval_count":6,"eval_duration":1272324000}

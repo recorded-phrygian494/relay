@@ -1,0 +1,16 @@
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051949,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"1"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051949,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"2"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051949,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"3"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051949,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"4"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051949,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"5"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051950,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-525","object":"chat.completion.chunk","created":1784051950,"model":"mistral-nemo:latest","system_fingerprint":"fp_ollama","choices":[],"usage":{"prompt_tokens":14,"completion_tokens":6,"total_tokens":20}}
+
+data: [DONE]
+

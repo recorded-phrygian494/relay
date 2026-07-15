@@ -1,0 +1,1 @@
+{"model":"mistral-nemo:latest","stream":false,"messages":[{"role":"system","content":"You are terse."},{"role":"user","content":"Say exactly: hello relay"}],"options":{"temperature":0,"num_predict":40}}

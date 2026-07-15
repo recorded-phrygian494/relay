@@ -1,0 +1,1 @@
+{"model":"mistral-nemo:latest","stream":true,"messages":[{"role":"user","content":"What is the weather in Dublin? Use the tool."}],"tools":[{"type":"function","function":{"name":"get_weather","description":"Get current weather for a city","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}],"options":{"temperature":0,"num_predict":200}}

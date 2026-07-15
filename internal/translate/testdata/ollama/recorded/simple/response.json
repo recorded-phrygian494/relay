@@ -1,0 +1,1 @@
+{"model":"mistral-nemo:latest","created_at":"2026-07-14T17:58:33.0452241Z","message":{"role":"assistant","content":"Hello Relay"},"done":true,"done_reason":"stop","total_duration":31606003300,"load_duration":27019651900,"prompt_eval_count":12,"prompt_eval_duration":3148360000,"eval_count":3,"eval_duration":941462000}
