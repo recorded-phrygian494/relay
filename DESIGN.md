@@ -369,6 +369,8 @@ two}, plus Gemini-out from either. Non-streaming and streaming each direction.
 | logprobs, seed, etc. | supported | no | Strictness-dependent: drop+warn (default) or 400 |
 | Usage in stream | `stream_options.include_usage` final chunk | `message_delta.usage` | Always request usage upstream when available; emit per inbound dialect's convention |
 | Thinking blocks | reasoning_content (varies by compat provider) | `thinking` blocks | Passthrough same-dialect; cross-dialect: surface as Ext, drop from content (v1) |
+| `role:"system"` in messages | normal | undocumented, but Claude Code sends it and the live API tolerates it (recorded 2026-07-14) | Accept on parse; hoist into the `system` parameter outbound |
+| block `cache_control` | none | on system/tools/content blocks; silently dropping it breaks prompt caching | `BlockExt` on IR parts; same-dialect passthrough, dropped cross-dialect |
 
 ### 5.2 Streaming translation = two small state machines
 
@@ -566,6 +568,9 @@ events. Semantic cache: documented extension point (interface exists, one impl: 
 ## 11. Quality bars (restated as CI gates)
 
 - `go vet` + `golangci-lint` + `-race` clean; coverage gate >80% on `translate`, `router`
+- **Race gate (review condition, binding):** `-race` is unsupported on windows/arm64
+  dev machines, so every phase gate runs it in a container before review:
+  `docker run --rm -v .:/app -w /app golang:1.25 go test -race ./...`
 - Fuzz targets on both inbound parsers; zero panics on malformed input
 - Fixture-only provider tests — CI never touches a real API
 - Benchmark suite proving p50 overhead <5ms non-streaming, <2ms added TTFT (httptest
