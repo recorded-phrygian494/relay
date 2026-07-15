@@ -227,6 +227,8 @@ const (
 	EventMessageStart EventKind = iota
 	EventTextDelta
 	EventThinkingDelta
+	EventSignatureDelta   // thinking-signature fragment; Text carries the fragment.
+	EventRedactedThinking // complete redacted_thinking block; Text carries the opaque data.
 	EventToolCallStart
 	EventToolCallDelta
 	EventToolCallEnd

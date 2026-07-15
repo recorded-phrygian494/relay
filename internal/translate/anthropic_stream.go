@@ -85,7 +85,8 @@ func (s *anthropicStream) ingest(ev *anthropic.StreamEvent) {
 		}
 		idx := *ev.Index
 		s.blockKind[idx] = ev.ContentBlock.Type
-		if ev.ContentBlock.Type == "tool_use" {
+		switch ev.ContentBlock.Type {
+		case "tool_use":
 			ord := s.nextTool
 			s.nextTool++
 			s.toolOrdinal[idx] = ord
@@ -95,6 +96,9 @@ func (s *anthropicStream) ingest(ev *anthropic.StreamEvent) {
 				ToolID:    ev.ContentBlock.ID,
 				ToolName:  ev.ContentBlock.Name,
 			})
+		case "redacted_thinking":
+			// Arrives whole in content_block_start; must pass through intact.
+			s.pending = append(s.pending, core.Event{Kind: core.EventRedactedThinking, Text: ev.ContentBlock.Data})
 		}
 
 	case "content_block_delta":
@@ -120,7 +124,12 @@ func (s *anthropicStream) ingest(ev *anthropic.StreamEvent) {
 				s.pending = append(s.pending, core.Event{Kind: core.EventThinkingDelta, Text: ev.Delta.Thinking})
 			}
 		case "signature_delta":
-			// Thinking signatures are not modeled in stream events (v1).
+			// Signatures MUST survive same-dialect hops: clients replay
+			// thinking blocks with their signature on the next turn and the
+			// API validates it. Dropping this breaks multi-turn thinking.
+			if ev.Delta.Signature != "" {
+				s.pending = append(s.pending, core.Event{Kind: core.EventSignatureDelta, Text: ev.Delta.Signature})
+			}
 		}
 
 	case "content_block_stop":
@@ -264,6 +273,16 @@ func (a *AnthropicStreamWriter) OnEvent(ev core.Event) error {
 			}
 		}
 		return a.delta(anthropic.StreamDelta{Type: "thinking_delta", Thinking: ev.Text})
+	case core.EventSignatureDelta:
+		if a.openKind != "thinking" {
+			return nil // defensive: signature without an open thinking block
+		}
+		return a.delta(anthropic.StreamDelta{Type: "signature_delta", Signature: ev.Text})
+	case core.EventRedactedThinking:
+		if err := a.openBlock("redacted_thinking", anthropic.ContentBlock{Type: "redacted_thinking", Data: ev.Text}); err != nil {
+			return err
+		}
+		return a.closeBlock()
 	case core.EventToolCallStart:
 		id := ev.ToolID
 		if id == "" {

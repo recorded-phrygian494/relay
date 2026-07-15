@@ -240,8 +240,9 @@ func (o *OpenAIStreamWriter) OnEvent(ev core.Event) error {
 				Function: openai.FunctionCall{Arguments: ev.ArgsFragment},
 			}}},
 		}))
-	case core.EventToolCallEnd, core.EventThinkingDelta:
-		// No wire representation in this dialect.
+	case core.EventToolCallEnd, core.EventThinkingDelta, core.EventSignatureDelta, core.EventRedactedThinking:
+		// No wire representation in this dialect (thinking is dropped
+		// cross-dialect in v1, DESIGN §5.1).
 		return nil
 	case core.EventMessageEnd:
 		fr, ok := coreStopToOpenAI[ev.StopReason]

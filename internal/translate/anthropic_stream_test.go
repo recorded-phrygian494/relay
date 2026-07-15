@@ -84,13 +84,41 @@ func TestParseAnthropicStreamTools(t *testing.T) {
 	}
 }
 
+// A same-dialect thinking stream must surface every component: text,
+// signature (API-validated on replay), and redacted blocks.
+func TestParseAnthropicStreamThinking(t *testing.T) {
+	events := collectAnthropicEvents(t, readAnthropicStream(t, "thinking.txt"))
+	want := []core.EventKind{
+		core.EventMessageStart,
+		core.EventThinkingDelta, core.EventThinkingDelta, core.EventSignatureDelta,
+		core.EventRedactedThinking,
+		core.EventTextDelta,
+		core.EventMessageEnd, core.EventUsage,
+	}
+	if got := kinds(events); !equalKinds(got, want) {
+		t.Fatalf("kinds\nwant %v\ngot  %v", want, got)
+	}
+	if events[1].Text+events[2].Text != "Euclid's argument applies." {
+		t.Fatalf("thinking text: %q %q", events[1].Text, events[2].Text)
+	}
+	if events[3].Text != "EqQBCgIYAhIkey-sig-payload==" {
+		t.Fatalf("signature: %q", events[3].Text)
+	}
+	if events[4].Text != "opaque-redacted-payload==" {
+		t.Fatalf("redacted data: %q", events[4].Text)
+	}
+}
+
 // anthropicAggregate folds an Anthropic SSE stream into its semantic
 // message, mirroring aggregateSSE for the OpenAI dialect.
 type anthropicAggregate struct {
-	text   string
-	tools  map[string]string // id -> name + "|" + assembled json
-	stop   string
-	output int
+	text      string
+	thinking  string
+	signature string
+	redacted  string
+	tools     map[string]string // id -> name + "|" + assembled json
+	stop      string
+	output    int
 }
 
 func aggregateAnthropicSSE(t *testing.T, raw string) anthropicAggregate {
@@ -116,12 +144,19 @@ func aggregateAnthropicSSE(t *testing.T, raw string) anthropicAggregate {
 				openTools[*ev.Index] = ev.ContentBlock.ID
 				agg.tools[ev.ContentBlock.ID] = ev.ContentBlock.Name + "|"
 			}
+			if ev.ContentBlock != nil && ev.ContentBlock.Type == "redacted_thinking" {
+				agg.redacted += ev.ContentBlock.Data
+			}
 		case "content_block_delta":
 			switch ev.Delta.Type {
 			case "text_delta":
 				agg.text += ev.Delta.Text
 			case "input_json_delta":
 				agg.tools[openTools[*ev.Index]] += ev.Delta.PartialJSON
+			case "thinking_delta":
+				agg.thinking += ev.Delta.Thinking
+			case "signature_delta":
+				agg.signature += ev.Delta.Signature
 			}
 		case "message_delta":
 			if ev.Delta != nil && ev.Delta.StopReason != "" {
@@ -137,7 +172,7 @@ func aggregateAnthropicSSE(t *testing.T, raw string) anthropicAggregate {
 // TestAnthropicStreamRoundTrip: fixture SSE → core events → re-emitted SSE
 // must aggregate to the same semantic message (binding suite, streaming).
 func TestAnthropicStreamRoundTrip(t *testing.T) {
-	for _, name := range []string{"text.txt", "tools.txt"} {
+	for _, name := range []string{"text.txt", "tools.txt", "thinking.txt"} {
 		t.Run(name, func(t *testing.T) {
 			runAnthropicStreamRoundTrip(t, readAnthropicStream(t, name))
 		})
@@ -163,6 +198,11 @@ func runAnthropicStreamRoundTrip(t *testing.T, raw string) {
 	got := aggregateAnthropicSSE(t, rec.Body.String())
 	if want.text != got.text || want.stop != got.stop || want.output != got.output {
 		t.Fatalf("aggregate mismatch\nwant %+v\ngot  %+v\nstream:\n%s", want, got, rec.Body.String())
+	}
+	// Thinking must survive same-dialect hops COMPLETE: text, signature
+	// (validated by the API on the next turn), and redacted blocks.
+	if want.thinking != got.thinking || want.signature != got.signature || want.redacted != got.redacted {
+		t.Fatalf("thinking lost in transit\nwant %+v\ngot  %+v\nstream:\n%s", want, got, rec.Body.String())
 	}
 	if len(want.tools) != len(got.tools) {
 		t.Fatalf("tools: want %v got %v", want.tools, got.tools)
