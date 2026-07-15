@@ -13,6 +13,8 @@ import (
 
 	"github.com/relay-llm/relay/internal/config"
 	"github.com/relay-llm/relay/internal/provider"
+	"github.com/relay-llm/relay/internal/provider/anthropicprov"
+	"github.com/relay-llm/relay/internal/provider/gemini"
 	"github.com/relay-llm/relay/internal/provider/ollama"
 	"github.com/relay-llm/relay/internal/provider/openaicompat"
 	"github.com/relay-llm/relay/internal/provider/openaiprov"
@@ -49,6 +51,10 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 				Headers: pc.Headers,
 				Quirks:  quirks,
 			}, httpClient)
+		case "anthropic":
+			providers[name] = anthropicprov.New(name, pc.BaseURL, pc.APIKey.First(), httpClient)
+		case "gemini":
+			providers[name] = gemini.New(name, pc.BaseURL, pc.APIKey.First(), httpClient)
 		case "ollama":
 			providers[name] = ollama.New(name, pc.BaseURL, httpClient)
 		default:

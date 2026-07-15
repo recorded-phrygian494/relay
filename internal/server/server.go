@@ -39,6 +39,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /health", s.handleHealth)
 	mux.HandleFunc("GET /v1/models", s.auth(s.handleModels))
 	mux.HandleFunc("POST /v1/chat/completions", s.auth(s.handleChatCompletions))
+	mux.HandleFunc("POST /v1/messages", s.auth(s.handleMessages))
+	mux.HandleFunc("POST /v1/messages/count_tokens", s.auth(s.handleCountTokens))
 	return mux
 }
 

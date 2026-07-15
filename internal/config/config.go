@@ -179,6 +179,10 @@ func (c *Config) finalize() error {
 			switch {
 			case name == "openai":
 				p.Type = "openai"
+			case name == "anthropic":
+				p.Type = "anthropic"
+			case name == "gemini":
+				p.Type = "gemini"
 			case name == "ollama":
 				p.Type = "ollama"
 			case p.Profile != "":
@@ -189,9 +193,7 @@ func (c *Config) finalize() error {
 			default:
 				return fmt.Errorf("providers.%s: missing type (want openai | openai-compat | ollama)", name)
 			}
-		case "openai", "ollama", "openai-compat":
-		case "anthropic", "gemini":
-			return fmt.Errorf("providers.%s: type %q lands in phase 2", name, p.Type)
+		case "openai", "anthropic", "gemini", "ollama", "openai-compat":
 		default:
 			return fmt.Errorf("providers.%s: unknown type %q", name, p.Type)
 		}
@@ -261,7 +263,12 @@ func Sniff() *Config {
 		}
 	}
 	if k := os.Getenv("ANTHROPIC_API_KEY"); k != "" {
-		cfg.Warnings = append(cfg.Warnings, "ANTHROPIC_API_KEY found but the anthropic adapter lands in phase 2; ignoring for now")
+		cfg.Providers["anthropic"] = Provider{Type: "anthropic", APIKey: StringList{k}}
+	}
+	if k := os.Getenv("GEMINI_API_KEY"); k != "" {
+		cfg.Providers["gemini"] = Provider{Type: "gemini", APIKey: StringList{k}}
+	} else if k := os.Getenv("GOOGLE_API_KEY"); k != "" {
+		cfg.Providers["gemini"] = Provider{Type: "gemini", APIKey: StringList{k}}
 	}
 	if probeOllama() {
 		cfg.Providers["ollama"] = Provider{Type: "ollama"}

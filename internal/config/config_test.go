@@ -57,7 +57,6 @@ routing:
 func TestLoadRejectsBadConfig(t *testing.T) {
 	cases := map[string]string{
 		"unknown provider type": "providers:\n  x:\n    type: bogus\n",
-		"phase-2 type":          "providers:\n  a:\n    type: anthropic\n",
 		"compat without url":    "providers:\n  x:\n    type: openai-compat\n",
 		"bad static route":      "providers:\n  openai: {}\nrouting:\n  static:\n    fast: not-a-pair\n",
 		"unknown route provider": "providers:\n  openai: {}\nrouting:\n  static:\n    fast: nope/model\n",
