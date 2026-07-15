@@ -1,0 +1,14 @@
+{
+  "model": "claude-sonnet-5",
+  "max_tokens": 2048,
+  "thinking": {"type": "enabled", "budget_tokens": 1024},
+  "messages": [
+    {"role": "user", "content": "Prove there are infinitely many primes."},
+    {"role": "assistant", "content": [
+      {"type": "thinking", "thinking": "Euclid's argument...", "signature": "sig_xyz"},
+      {"type": "redacted_thinking", "data": "opaque-payload=="},
+      {"type": "text", "text": "Suppose finitely many primes exist."}
+    ]},
+    {"role": "user", "content": "Continue."}
+  ]
+}

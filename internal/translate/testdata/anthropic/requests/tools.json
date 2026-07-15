@@ -1,0 +1,19 @@
+{
+  "model": "claude-sonnet-5",
+  "max_tokens": 1024,
+  "messages": [
+    {"role": "user", "content": "What's the weather in Dublin?"},
+    {"role": "assistant", "content": [
+      {"type": "text", "text": "I'll check that for you."},
+      {"type": "tool_use", "id": "toolu_abc123", "name": "get_weather", "input": {"city": "Dublin"}}
+    ]},
+    {"role": "user", "content": [
+      {"type": "tool_result", "tool_use_id": "toolu_abc123", "content": "14C, raining"},
+      {"type": "text", "text": "And tomorrow?"}
+    ]}
+  ],
+  "tools": [
+    {"name": "get_weather", "description": "Get current weather for a city", "input_schema": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}}
+  ],
+  "tool_choice": {"type": "auto", "disable_parallel_tool_use": true}
+}

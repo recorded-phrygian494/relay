@@ -44,9 +44,40 @@ func stripNulls(v any) any {
 
 func requireSemanticEqual(t *testing.T, want, got []byte) {
 	t.Helper()
-	w, g := normalizeJSON(t, want), normalizeJSON(t, got)
+	w := canonOpenAI(normalizeJSON(t, want))
+	g := canonOpenAI(normalizeJSON(t, got))
 	if !reflect.DeepEqual(w, g) {
 		t.Fatalf("not semantically equal\nwant: %s\ngot:  %s", want, got)
+	}
+}
+
+// canonOpenAI folds equivalent wire forms together: a message's
+// "content": "" equals an absent content key (OpenAI proper sends null for
+// pure tool-call messages, Ollama's compat endpoint sends "" — recorded
+// reality, 2026-07), and streaming tool_calls indexes are positional noise
+// in non-streaming messages.
+func canonOpenAI(v any) any {
+	switch v := v.(type) {
+	case map[string]any:
+		if _, hasRole := v["role"]; hasRole {
+			if s, ok := v["content"].(string); ok && s == "" {
+				delete(v, "content")
+			}
+		}
+		if _, hasFn := v["function"]; hasFn {
+			delete(v, "index") // Ollama emits streaming-style indexes in non-streaming tool_calls
+		}
+		for k, val := range v {
+			v[k] = canonOpenAI(val)
+		}
+		return v
+	case []any:
+		for i := range v {
+			v[i] = canonOpenAI(v[i])
+		}
+		return v
+	default:
+		return v
 	}
 }
 
