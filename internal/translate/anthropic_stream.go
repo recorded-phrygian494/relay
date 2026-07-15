@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 // anthropicStream adapts an upstream Anthropic SSE body into core Events.

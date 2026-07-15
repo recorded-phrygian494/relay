@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // Static resolves a requested model name directly to a provider, in order:

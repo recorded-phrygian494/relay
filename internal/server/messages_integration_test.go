@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/config"
-	"github.com/relay-llm/relay/internal/store"
+	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/store"
 )
 
 // mockAnthropicUpstream speaks the Anthropic wire format.

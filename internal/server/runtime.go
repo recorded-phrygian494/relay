@@ -11,14 +11,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/relay-llm/relay/internal/config"
-	"github.com/relay-llm/relay/internal/provider"
-	"github.com/relay-llm/relay/internal/provider/anthropicprov"
-	"github.com/relay-llm/relay/internal/provider/gemini"
-	"github.com/relay-llm/relay/internal/provider/ollama"
-	"github.com/relay-llm/relay/internal/provider/openaicompat"
-	"github.com/relay-llm/relay/internal/provider/openaiprov"
-	"github.com/relay-llm/relay/internal/router"
+	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/provider/anthropicprov"
+	"github.com/llmrelay/relay/internal/provider/gemini"
+	"github.com/llmrelay/relay/internal/provider/ollama"
+	"github.com/llmrelay/relay/internal/provider/openaicompat"
+	"github.com/llmrelay/relay/internal/provider/openaiprov"
+	"github.com/llmrelay/relay/internal/router"
 )
 
 // Runtime is one immutable snapshot of config-derived state. Hot reload

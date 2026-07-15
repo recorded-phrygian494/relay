@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/api/anthropic"
 )
 
 // normalizeAnthropic canonicalizes the dialect's wire unions so that

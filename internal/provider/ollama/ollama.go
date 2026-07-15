@@ -15,9 +15,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/ids"
-	"github.com/relay-llm/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/ids"
+	"github.com/llmrelay/relay/internal/provider"
 )
 
 // DefaultBaseURL is the standard local Ollama address.

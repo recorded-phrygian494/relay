@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 // Event ordering contract (both directions): MessageStart first; per choice,

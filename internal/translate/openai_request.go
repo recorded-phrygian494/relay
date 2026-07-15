@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // FromOpenAIRequest converts an inbound OpenAI chat request to the IR.

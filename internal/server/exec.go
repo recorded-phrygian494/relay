@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/provider"
-	"github.com/relay-llm/relay/internal/router"
-	"github.com/relay-llm/relay/internal/store"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/router"
+	"github.com/llmrelay/relay/internal/store"
 )
 
 // failure is a dialect-neutral error to report to the client; each inbound

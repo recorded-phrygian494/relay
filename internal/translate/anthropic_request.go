@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // DefaultAnthropicMaxTokens is injected when an OpenAI-inbound request omits

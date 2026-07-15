@@ -6,7 +6,7 @@ package openaiprov
 import (
 	"net/http"
 
-	"github.com/relay-llm/relay/internal/provider/openaicompat"
+	"github.com/llmrelay/relay/internal/provider/openaicompat"
 )
 
 // DefaultBaseURL is the OpenAI API root.

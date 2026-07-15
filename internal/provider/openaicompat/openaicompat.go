@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/provider"
-	"github.com/relay-llm/relay/internal/translate"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/translate"
 )
 
 // Quirks captures known deviations of specific compat servers from the

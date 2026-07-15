@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/store"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/store"
 )
 
 // Server is the HTTP front end. The Runtime pointer is swapped atomically

@@ -12,9 +12,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/relay-llm/relay/internal/config"
-	"github.com/relay-llm/relay/internal/server"
-	"github.com/relay-llm/relay/internal/store"
+	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/server"
+	"github.com/llmrelay/relay/internal/store"
 )
 
 var version = "0.1.0-dev" // overridden by goreleaser ldflags in phase 5

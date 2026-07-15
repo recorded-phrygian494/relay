@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 func testRequest() *core.Request {

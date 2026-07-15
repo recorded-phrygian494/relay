@@ -12,10 +12,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/ids"
-	"github.com/relay-llm/relay/internal/provider"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/ids"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 // DefaultBaseURL is the AI Studio API root.

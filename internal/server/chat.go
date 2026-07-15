@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/ids"
-	"github.com/relay-llm/relay/internal/sse"
-	"github.com/relay-llm/relay/internal/store"
-	"github.com/relay-llm/relay/internal/translate"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/ids"
+	"github.com/llmrelay/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/store"
+	"github.com/llmrelay/relay/internal/translate"
 )
 
 const (

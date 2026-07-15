@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // Candidate is one (provider, model) pair in a fallback chain.

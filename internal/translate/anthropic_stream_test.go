@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 func readAnthropicStream(t *testing.T, name string) string {

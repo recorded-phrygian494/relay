@@ -10,9 +10,9 @@ import (
 
 	"encoding/json"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 func readStreamFixture(t *testing.T, name string) []byte {

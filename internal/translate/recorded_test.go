@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/sse"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/sse"
 )
 
 // TestRecordedOpenAIFixtures runs the binding identity suite over ground

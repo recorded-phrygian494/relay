@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // Provider is one configured upstream.

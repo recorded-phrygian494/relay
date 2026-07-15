@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/api/openai"
 )
 
 // normalizeJSON decodes b and strips null-valued object members recursively:

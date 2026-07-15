@@ -3,8 +3,8 @@ package translate
 import (
 	"fmt"
 
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 // finish_reason ⇄ core.StopReason. stop_sequence has no OpenAI equivalent

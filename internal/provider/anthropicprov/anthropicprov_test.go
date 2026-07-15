@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/provider"
 )
 
 func schemaRequest(stream bool) *core.Request {

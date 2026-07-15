@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
-	"github.com/relay-llm/relay/internal/api/openai"
-	"github.com/relay-llm/relay/internal/core"
+	"github.com/llmrelay/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/api/openai"
+	"github.com/llmrelay/relay/internal/core"
 )
 
 func loadOpenAIRequest(t *testing.T, name string) *core.Request {

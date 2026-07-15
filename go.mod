@@ -1,4 +1,4 @@
-module github.com/relay-llm/relay
+module github.com/llmrelay/relay
 
 go 1.25.0
 

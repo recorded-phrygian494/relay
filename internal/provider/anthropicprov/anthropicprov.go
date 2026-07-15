@@ -17,10 +17,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/relay-llm/relay/internal/api/anthropic"
-	"github.com/relay-llm/relay/internal/core"
-	"github.com/relay-llm/relay/internal/provider"
-	"github.com/relay-llm/relay/internal/translate"
+	"github.com/llmrelay/relay/internal/api/anthropic"
+	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/translate"
 )
 
 // DefaultBaseURL is the Anthropic API root.

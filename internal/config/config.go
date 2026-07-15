@@ -14,7 +14,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/relay-llm/relay/internal/provider/openaicompat"
+	"github.com/llmrelay/relay/internal/provider/openaicompat"
 )
 
 // Config is the root of relay.yaml.

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/relay-llm/relay/internal/config"
-	"github.com/relay-llm/relay/internal/store"
+	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/store"
 )
 
 // mockUpstream speaks the OpenAI wire format like a real provider would.
