@@ -6,13 +6,16 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 
 	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/pricing"
 	"github.com/llmrelay/relay/internal/server"
 	"github.com/llmrelay/relay/internal/store"
 )
@@ -22,10 +25,12 @@ var version = "0.1.0-dev" // overridden by goreleaser ldflags in phase 5
 const usage = `relay — self-hosted LLM gateway and model router
 
 Usage:
-  relay [serve]     run the gateway (default)
-  relay init        scaffold a relay.yaml
-  relay stats       traffic summary from the local request log
-  relay version     print the version
+  relay [serve]           run the gateway (default)
+  relay init              scaffold a relay.yaml
+  relay stats             traffic summary from the local request log
+  relay pricing update    refresh the pricing registry (explicit only, never automatic)
+  relay pricing show      print the active pricing registry source
+  relay version           print the version
 
 Flags for serve:
   --config PATH        config file (default: ./relay.yaml, ~/.relay/relay.yaml, or zero-config)
@@ -48,6 +53,8 @@ func main() {
 		err = runInit(args)
 	case "stats":
 		err = runStats(args)
+	case "pricing":
+		err = runPricing(args)
 	case "version":
 		fmt.Println("relay", version)
 	case "help", "-h", "--help":
@@ -198,6 +205,63 @@ func runInit(args []string) error {
 	}
 	fmt.Println("wrote relay.yaml — set your API keys as environment variables and run: relay serve")
 	return nil
+}
+
+// pricingURL is the project's published registry; fetched only on explicit
+// `relay pricing update` (DESIGN §9 — automatic refresh would be phone-home).
+const pricingURL = "https://raw.githubusercontent.com/llmrelay/relay/main/assets/pricing.json"
+
+func runPricing(args []string) error {
+	sub := ""
+	if len(args) > 0 {
+		sub, args = args[0], args[1:]
+	}
+	switch sub {
+	case "show":
+		reg, err := pricing.Load()
+		if err != nil {
+			log.Printf("%v", err)
+		}
+		src := "embedded snapshot"
+		if _, statErr := os.Stat(pricing.OverridePath()); statErr == nil && err == nil {
+			src = pricing.OverridePath()
+		}
+		fmt.Printf("pricing registry version %s (%s)\n", reg.Version, src)
+		return nil
+	case "update":
+		fs := flag.NewFlagSet("pricing update", flag.ExitOnError)
+		url := fs.String("url", pricingURL, "registry URL to fetch")
+		if err := fs.Parse(args); err != nil {
+			return err
+		}
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Get(*url)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("fetching %s: status %d", *url, resp.StatusCode)
+		}
+		raw, err := io.ReadAll(io.LimitReader(resp.Body, 4<<20))
+		if err != nil {
+			return err
+		}
+		if err := pricing.Validate(raw); err != nil {
+			return fmt.Errorf("fetched registry is invalid, not saving: %w", err)
+		}
+		dest := pricing.OverridePath()
+		if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(dest, raw, 0o644); err != nil {
+			return err
+		}
+		fmt.Printf("wrote %s\n", dest)
+		return nil
+	default:
+		return fmt.Errorf("usage: relay pricing <update|show>")
+	}
 }
 
 func runStats(args []string) error {

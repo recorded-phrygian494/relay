@@ -46,6 +46,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	rec := store.Record{ID: ids.New("req"), TS: start, API: "anthropic"}
 	defer func() {
 		rec.LatencyMS = time.Since(start).Milliseconds()
+		rec.CostUSD = rt.cost(rec.Provider, rec.ModelServed, rec.TokensIn, rec.TokensOut)
 		if s.store != nil {
 			s.store.Log(rec)
 		}

@@ -5,6 +5,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/llmrelay/relay/internal/config"
+	"github.com/llmrelay/relay/internal/pricing"
 	"github.com/llmrelay/relay/internal/provider"
 	"github.com/llmrelay/relay/internal/reliability"
 	"github.com/llmrelay/relay/internal/provider/anthropicprov"
@@ -30,6 +32,7 @@ type Runtime struct {
 	Providers map[string]provider.Provider
 	Router    router.Router
 	Exec      *reliability.Executor
+	Pricing   *pricing.Registry
 	catalog   *catalogCache
 
 	// degradedWarned dedupes the DESIGN §0.7 multi_turn_tools warning:
@@ -73,9 +76,14 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		return nil, fmt.Errorf("no providers configured: set provider API keys in relay.yaml or export OPENAI_API_KEY / run Ollama for zero-config mode")
 	}
 
+	registry, priceErr := pricing.Load()
+	if priceErr != nil {
+		log.Printf("pricing: %v", priceErr)
+	}
 	rt := &Runtime{
 		Config:    cfg,
 		Providers: providers,
+		Pricing:   registry,
 		catalog:   newCatalogCache(providers, 5*time.Minute),
 	}
 	pools := make(map[string]*reliability.KeyPool)
@@ -110,9 +118,9 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		}
 		specs[name] = spec
 	}
-	// Pricing and stats land later in phase 3; until then cheapest/fastest
-	// degrade to declared order / exploration, stated in their reasons.
-	table, err := router.CompileAliases(specs, nil, nil)
+	// Stats land later in phase 3; until then fastest degrades to
+	// exploration order, stated in its reasons.
+	table, err := router.CompileAliases(specs, rt.priceFor, nil)
 	if err != nil {
 		return nil, fmt.Errorf("routing.aliases: %w", err)
 	}
@@ -127,6 +135,43 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		}},
 	}
 	return rt, nil
+}
+
+// kindsFor lists every alias pricing may know a provider by: its config
+// name, profile, and type.
+func (rt *Runtime) kindsFor(providerName string) []string {
+	kinds := []string{providerName}
+	if pc, ok := rt.Config.Providers[providerName]; ok {
+		if pc.Profile != "" {
+			kinds = append(kinds, pc.Profile)
+		}
+		if pc.Type != "" {
+			kinds = append(kinds, pc.Type)
+		}
+	}
+	return kinds
+}
+
+// priceFor is the cheapest policy's PriceFunc. Ollama is local compute:
+// $0, and it must rank as free rather than unknown.
+func (rt *Runtime) priceFor(providerName, model string) (in, out float64, ok bool) {
+	if pc, exists := rt.Config.Providers[providerName]; exists && pc.Type == "ollama" {
+		return 0, 0, true
+	}
+	if rt.Pricing == nil {
+		return 0, 0, false
+	}
+	return rt.Pricing.Price(rt.kindsFor(providerName), model)
+}
+
+// cost prices one served request for the log; unknown models cost 0 and
+// the field stays honest (never guessed).
+func (rt *Runtime) cost(providerName, model string, tokensIn, tokensOut int) float64 {
+	in, out, ok := rt.priceFor(providerName, model)
+	if !ok {
+		return 0
+	}
+	return (float64(tokensIn)*in + float64(tokensOut)*out) / 1e6
 }
 
 // catalogCache merges provider model lists with a TTL. Provider catalog
