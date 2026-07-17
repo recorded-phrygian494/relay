@@ -1,0 +1,31 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "hello relay",
+            "thoughtSignature": "EjQKMgERTTIPZYCc1J2Wd9Vj7VbMYYeGoM83mR8tYsawdjDSXoOazDKnibgyTZV5W7qL6Evi"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 10,
+    "candidatesTokenCount": 2,
+    "totalTokenCount": 12,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 10
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-3.1-flash-lite",
+  "responseId": "MGFZauLsCqSzkdUPquWyyAY"
+}

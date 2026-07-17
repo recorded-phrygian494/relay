@@ -1,0 +1,1 @@
+{"model":"claude-haiku-4-5-20251001","max_tokens":40,"system":"You are terse.","messages":[{"role":"user","content":"Say exactly: hello relay"}],"temperature":0}

@@ -1,0 +1,1 @@
+{"model":"claude-haiku-4-5-20251001","max_tokens":60,"messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/png","data":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="}},{"type":"text","text":"One word: what color is this pixel?"}]}],"temperature":0}

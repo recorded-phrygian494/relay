@@ -1,0 +1,1 @@
+{"systemInstruction":{"parts":[{"text":"You are terse."}]},"contents":[{"role":"user","parts":[{"text":"Say exactly: hello relay"}]}],"generationConfig":{"maxOutputTokens":40,"temperature":0}}

@@ -1,0 +1,1 @@
+{"model":"claude-haiku-4-5-20251001","max_tokens":200,"messages":[{"role":"user","content":"What is the weather in Dublin? Use the tool."}],"tools":[{"name":"get_weather","description":"Get current weather for a city","input_schema":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}],"tool_choice":{"type":"any"},"temperature":0,"stream":true}

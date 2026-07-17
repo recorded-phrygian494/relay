@@ -1,0 +1,42 @@
+event: message_start
+data: {"type":"message_start","message":{"model":"claude-haiku-4-5-20251001","id":"msg_011Cd6ZHCRTbZ5VwiUxXA6Da","type":"message","role":"assistant","content":[],"stop_reason":null,"stop_sequence":null,"stop_details":null,"usage":{"input_tokens":55,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":1,"service_tier":"standard","inference_geo":"not_available"}}       }
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":""}}
+
+event: ping
+data: {"type": "ping"}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"17"}    }
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":" * 23\n\nI can calculate this as:\n17 * 23 = 17 * (20 + 3) = 17 * 20 + 17 * 3 = "}            }
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":"340 + 51 = 391\n\nLet me verify: 17 * 20 = 340, 17 * 3 = 51"}      }
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"thinking_delta","thinking":", 340 + 51 = 391\n\nYes, that's correct."}    }
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"signature_delta","signature":"EqUDCpMBCA8YAipAe9MzMEcdwIV8ZzZCI/fm9hqHuT88ShZuwvih3GMvb6Fo4PEVMp+ETa5nDzTIGPcg8UAcFSGcziDdnoCoQg52CzIZY2xhdWRlLWhhaWt1LTQtNS0yMDI1MTAwMTgAQgh0aGlua2luZ1okNDJhMTBjNjktY2U2Mi00ZDFkLWIxZGYtNjU3ZDk0NDU0MGRjEgxEQAB3RX6SHPN0N/waDCbhq/wlsoXEM8vcMyIwDPxa/k6OhBZWnLlGKM1i+o9fC6Gw3CRfzj4GPShrl4gp4CIp9hERS3WHFsruI/h6Kr4B9AeE38C8cl7DcZhLNl90/toI0KiR0DXtoeIopMkR4OHuyL1ZNdPL0uvZjljl0gthj3Syj2tBSXZ8QrXjWMwMPrS/5Vnp/p6yXkrvmV8IjP0GHy4SsJ7uNYfzwL+Te1jn1Q/tojoiqfoUVHtAhq8OEmrLTo0fD49KTxiqey4my1coP0Fl7MyeBsl0PXc31yUcdcGv3BhS7ZpGikKNrqY8M+sN7UX9geBye1ZHUiNlu8c6f5ZhN3xMmacykMlojRgB"}             }
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":0 }
+
+event: content_block_start
+data: {"type":"content_block_start","index":1,"content_block":{"type":"text","text":""}              }
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":1,"delta":{"type":"text_delta","text":"391"}       }
+
+event: content_block_stop
+data: {"type":"content_block_stop","index":1           }
+
+event: message_delta
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null,"stop_details":null},"usage":{"input_tokens":55,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":114,"output_tokens_details":{"thinking_tokens":107}}         }
+
+event: message_stop
+data: {"type":"message_stop"       }
+

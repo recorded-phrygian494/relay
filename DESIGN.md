@@ -5,7 +5,8 @@
 > outbound (BYOK), with pluggable routing policies from `static` to learned `smart`
 > routing. Zero telemetry. Apache-2.0.
 
-Status: **Phase 0 approved with conditions (2026-07-14); Phase 1 in progress.** This
+Status: **Phases 1–2 complete; Phase 3 in progress (Step 0 corpus audit done
+2026-07-16 — findings in `docs/quirks.md`, one decision pending in §0.7).** This
 document is kept current as the code evolves.
 
 **Standing convention:** any decision where the implementation disagrees with the spec
@@ -124,7 +125,32 @@ If `relay` binds to a non-loopback address with no admin API key configured, it
 provider keys is the one foot-gun this product must not ship. Loopback with no key is
 allowed (the zero-config path).
 
-Everything below assumes the six decisions above.
+### 0.7 Gemini 3 thought signatures vs. a stateless gateway — needs your sign-off
+
+Found by the Phase 3 Step 0 corpus audit (2026-07-16, see `docs/quirks.md`):
+Gemini 3 models attach `thoughtSignature` to response parts and require them
+back on function-call replay. Anthropic's equivalent we already solved — but
+only because the Anthropic dialect exists *inbound*, so signatures ride through
+same-dialect hops. Gemini is outbound-only: an OpenAI-dialect client replays
+history in OpenAI shapes, which have no field for a Gemini signature. Options:
+
+1. **Document the limitation (recommended for v1).** Consistent with the existing
+   policy "thinking is passthrough same-dialect only, dropped cross-dialect."
+   Consequence: multi-turn tool use against Gemini 3 models may be rejected for
+   missing signatures; single-turn and non-tool traffic unaffected. README's
+   compatibility table gets a row, same honesty rule as the Responses API (§0.5).
+2. **Smuggle the signature inside the synthesized tool-call id** (some gateways
+   do this): clients treat ids as opaque and echo them back, so the adapter can
+   decode on replay. Covers only functionCall signatures (text-part signatures
+   have no echo channel), bloats ids (signatures can reach KBs on pro models),
+   and quietly couples us to clients never truncating ids. Clever, fragile.
+3. **Server-side signature cache** keyed by a conversation-ish hash — state in a
+   product whose reliability story is statelessness. Not for v1.
+
+Proposed: option 1 now; revisit option 2 in Phase 4 if user demand shows up.
+**(pending sign-off)**
+
+Everything below assumes the seven decisions above.
 
 ---
 

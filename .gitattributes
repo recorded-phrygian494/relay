@@ -1,3 +1,8 @@
 * text=auto eol=lf
 *.png binary
 *.jpg binary
+
+# Recorded fixtures are ground-truth bytes from live APIs (DESIGN §5.3);
+# line-ending normalization must never rewrite them. Gemini's SSE really
+# does use CRLF — that is part of what was recorded.
+internal/translate/testdata/*/recorded/** -text

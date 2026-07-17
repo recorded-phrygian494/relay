@@ -1,0 +1,4 @@
+data: {"candidates": [{"content": {"parts": [{"functionCall": {"name": "get_weather","args": {"city": "Dublin"},"id": "HbfQ4gVK"},"thoughtSignature": "EjQKMgERTTIPa11CzdZZ3qELnmDQQv23hUMV6Qlh2cY33fyq2/WkfgQOSQ+D7Q0bLn5L62aM"}],"role": "model"},"index": 0}],"usageMetadata": {"promptTokenCount": 55,"candidatesTokenCount": 16,"totalTokenCount": 71,"promptTokensDetails": [{"modality": "TEXT","tokenCount": 55}],"serviceTier": "standard"},"modelVersion": "gemini-3.1-flash-lite","responseId": "MWFZavfWJPi0kdUPw9SIgQQ"}
+
+data: {"candidates": [{"content": {"parts": [{"text": ""}],"role": "model"},"finishReason": "STOP","index": 0}],"usageMetadata": {"promptTokenCount": 55,"candidatesTokenCount": 16,"totalTokenCount": 71,"promptTokensDetails": [{"modality": "TEXT","tokenCount": 55}],"serviceTier": "standard"},"modelVersion": "gemini-3.1-flash-lite","responseId": "MWFZavfWJPi0kdUPw9SIgQQ"}
+

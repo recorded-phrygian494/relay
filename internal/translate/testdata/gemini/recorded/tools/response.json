@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "functionCall": {
+              "name": "get_weather",
+              "args": {
+                "city": "Dublin"
+              },
+              "id": "Ru4BlAgl"
+            },
+            "thoughtSignature": "EjQKMgERTTIPuY/zgX1R+w3IuT0MmBl6KutE3koARuse8f3IaDLFDnEfwdyaHnDYQw2R6xg6"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "finishMessage": "Model generated function call(s)."
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 55,
+    "candidatesTokenCount": 16,
+    "totalTokenCount": 71,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 55
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-3.1-flash-lite",
+  "responseId": "MGFZaq2rJ8Lp7M8PvOClwAI"
+}

@@ -288,8 +288,8 @@ func toolResultObject(p core.ToolResultPart) json.RawMessage {
 }
 
 // sanitizeSchema strips JSON-Schema keywords the v1beta API rejects
-// ($schema, additionalProperties), recursively. Verified against live API
-// errors 2026-07; revisit when recorded fixtures land.
+// ($schema, additionalProperties), recursively. Live-verified 2026-07-16:
+// both keywords still 400 with INVALID_ARGUMENT (docs/quirks.md).
 func sanitizeSchema(schema json.RawMessage) json.RawMessage {
 	if len(schema) == 0 {
 		return schema
