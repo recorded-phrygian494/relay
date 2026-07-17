@@ -2,6 +2,7 @@ package gemini
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/llmrelay/relay/internal/core"
+	"github.com/llmrelay/relay/internal/provider"
 )
 
 // recordedDir is the ground-truth corpus captured by tools/record. All
@@ -50,6 +52,53 @@ func replayServer(t *testing.T, body []byte, stream bool) *httptest.Server {
 		}
 		_, _ = w.Write(body)
 	}))
+}
+
+// TestMissingThoughtSignatureError pins the DESIGN §0.7 condition-1 mapping
+// to the recorded validation error: Gemini's thought-signature 400 must
+// surface as the typed, self-explaining gemini_missing_thought_signature.
+func TestMissingThoughtSignatureError(t *testing.T) {
+	raw, err := os.ReadFile(filepath.Join(recordedDir, "missing_thought_signature", "error.json"))
+	if err != nil {
+		t.Skip("missing_thought_signature fixture not recorded")
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write(raw)
+	}))
+	defer srv.Close()
+	c := New("gemini", srv.URL, "k", nil)
+	_, err = c.Complete(context.Background(), testRequest())
+	var pe *provider.Error
+	if !errors.As(err, &pe) {
+		t.Fatalf("want *provider.Error, got %T: %v", err, err)
+	}
+	if pe.Code != "gemini_missing_thought_signature" {
+		t.Fatalf("code: %q", pe.Code)
+	}
+	if pe.Retryable {
+		t.Fatal("signature validation failure must not be retryable")
+	}
+	for _, want := range []string{"quirks.md", "§0.7", "alias/fallback", "single-turn"} {
+		if !strings.Contains(pe.Message, want) {
+			t.Fatalf("message missing %q: %s", want, pe.Message)
+		}
+	}
+	if len(pe.Raw) == 0 {
+		t.Fatal("raw provider error body not preserved")
+	}
+}
+
+// TestCapabilities pins the multi_turn_tools flag to the gemini-3 family
+// (DESIGN §0.7 condition 2).
+func TestCapabilities(t *testing.T) {
+	c := New("gemini", "http://unused", "k", nil)
+	if got := c.Capabilities("gemini-3.1-flash-lite").MultiTurnTools; got != provider.MultiTurnToolsDegraded {
+		t.Fatalf("gemini-3.1-flash-lite: %q", got)
+	}
+	if got := c.Capabilities("gemini-2.0-flash").MultiTurnTools; got != "" {
+		t.Fatalf("gemini-2.0-flash: %q", got)
+	}
 }
 
 func checkRecordedComplete(t *testing.T, name string, raw []byte) {

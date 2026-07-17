@@ -1,0 +1,6 @@
+{"contents":[
+ {"role":"user","parts":[{"text":"What is the weather in Dublin? Use the tool."}]},
+ {"role":"model","parts":[{"functionCall":{"name":"get_weather","args":{"city":"Dublin"},"id":"Ru4BlAgl"},"thoughtSignature":"EjQKMgERTTIPuY/zgX1R+w3IuT0MmBl6KutE3koARuse8f3IaDLFDnEfwdyaHnDYQw2R6xg6"}]},
+ {"role":"user","parts":[{"functionResponse":{"name":"get_weather","response":{"result":"14C, raining"}}}]}],
+"tools":[{"functionDeclarations":[{"name":"get_weather","description":"Get current weather for a city","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}]}],
+"generationConfig":{"maxOutputTokens":60,"temperature":0}}

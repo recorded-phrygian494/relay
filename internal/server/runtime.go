@@ -29,6 +29,11 @@ type Runtime struct {
 	Providers map[string]provider.Provider
 	Router    router.Router
 	catalog   *catalogCache
+
+	// degradedWarned dedupes the DESIGN §0.7 multi_turn_tools warning:
+	// one log line per conversation, keyed by candidate + first replayed
+	// tool-call id. Reset on hot reload, which is acceptable.
+	degradedWarned sync.Map
 }
 
 // BuildRuntime constructs providers and the router from a validated config.

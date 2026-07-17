@@ -1,0 +1,31 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "The weather in Dublin is currently 14°C and raining.",
+            "thoughtSignature": "EjQKMgERTTIP/JqvF4SMtV2zEVM0JTexZnHNs0GoFEHLNNo/foe6N6PpcuX242HASLa+aBEn"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 89,
+    "candidatesTokenCount": 14,
+    "totalTokenCount": 103,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 89
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-3.1-flash-lite",
+  "responseId": "FedZaqqLF4eivdIPjLTZ2QU"
+}

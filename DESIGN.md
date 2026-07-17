@@ -147,8 +147,37 @@ history in OpenAI shapes, which have no field for a Gemini signature. Options:
 3. **Server-side signature cache** keyed by a conversation-ish hash — state in a
    product whose reliability story is statelessness. Not for v1.
 
-Proposed: option 1 now; revisit option 2 in Phase 4 if user demand shows up.
-**(pending sign-off)**
+**Resolved 2026-07-17: option 1 approved as scoped — document, don't smuggle —
+with two binding conditions and one investigation (done):**
+
+- **Condition 1 (binding) — fail loudly, not mysteriously.** Relay detects the
+  case itself: Gemini's signature-validation 400 maps to a typed error
+  (`gemini_missing_thought_signature`) that names the limitation, links to the
+  docs section, and states the workarounds (alias/fallback multi-turn tool
+  traffic elsewhere, or keep tool use single-turn). A structured warning is
+  logged the first time a conversation crosses the line and is appended to the
+  route reason, so the dashboard's recent-decisions view surfaces it. The
+  mapping is backed by a recorded fixture of the real validation error
+  (`testdata/gemini/recorded/missing_thought_signature/`).
+- **Condition 2 (binding) — routing-level escape hatch.** The model catalog
+  carries per-provider/model capability metadata (`multi_turn_tools: degraded`
+  for Gemini 3 targets), and fallback-chain resolution considers it, so one
+  alias can steer multi-turn tool traffic away from Gemini 3 without the user
+  thinking about signatures. Capability metadata is needed for Phase 4 anyway —
+  the field is built now and populated for this case.
+- **Investigation (done 2026-07-16, recorded):** Google's own OpenAI-compat
+  endpoint (`/v1beta/openai/`) does NOT absorb the problem — it surfaces the
+  signature in a nonstandard `tool_calls[].extra_content.google.thought_signature`
+  field and rejects replay without it with the identical 400. Routing Gemini
+  traffic through the compat endpoint is therefore not a fix; conditions 1+2
+  ship as designed. Findings in `docs/quirks.md`.
+
+**Fast-follow (post-v1, door stays architecturally open):** (a) an opt-in
+in-memory LRU signature cache keyed by tool-call id — the known future fix for
+transparent multi-turn tool use on Gemini 3; (b) adopting Google's own
+`extra_content.google.thought_signature` convention in relay's OpenAI inbound
+dialect as a passthrough echo channel for clients that replay message objects
+faithfully.
 
 Everything below assumes the seven decisions above.
 

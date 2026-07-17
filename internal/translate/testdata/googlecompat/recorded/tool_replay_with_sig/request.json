@@ -1,0 +1,6 @@
+{"model":"gemini-3.1-flash-lite","messages":[
+ {"role":"user","content":"What is the weather in Dublin? Use the tool."},
+ {"role":"assistant","tool_calls":[{"id":"aztawCKM","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Dublin\"}"},"extra_content":{"google":{"thought_signature":"EjQKMgERTTIPqQ2LggvXpXLC3kOwknAsJhQfa0id0dAiZa4c28NgiEx2OQSwPLyQ2zoSM2Pn"}}}]},
+ {"role":"tool","tool_call_id":"aztawCKM","content":"14C, raining"}],
+"tools":[{"type":"function","function":{"name":"get_weather","description":"Get current weather for a city","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}],
+"max_tokens":60,"temperature":0}

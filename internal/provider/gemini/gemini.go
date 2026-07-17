@@ -372,9 +372,39 @@ func (c *Client) post(ctx context.Context, path string, body any, stream bool) (
 		if err := json.Unmarshal(raw, &wire); err == nil && wire.Error != nil {
 			msg, code = wire.Error.Message, wire.Error.Status
 		}
+		if resp.StatusCode == http.StatusBadRequest && strings.Contains(msg, "thought_signature") {
+			return nil, missingSignatureError(c.name, raw)
+		}
 		return nil, provider.NewError(c.name, resp.StatusCode, code, msg, raw)
 	}
 	return resp, nil
+}
+
+// missingSignatureError maps Gemini's thought-signature validation 400 to a
+// typed error naming the v1 limitation and its workarounds (DESIGN §0.7
+// condition 1; fixture: testdata/gemini/recorded/missing_thought_signature).
+func missingSignatureError(name string, raw []byte) *provider.Error {
+	return &provider.Error{
+		Provider: name,
+		Status:   http.StatusBadRequest,
+		Code:     "gemini_missing_thought_signature",
+		Message: "Gemini 3 validates thought signatures on function-call replay, and relay " +
+			"cannot carry them across dialects — a documented limitation (relay: docs/quirks.md " +
+			"\"thoughtSignature\", DESIGN §0.7; upstream: https://ai.google.dev/gemini-api/docs/thought-signatures). " +
+			"Workarounds: route multi-turn tool use to another provider via an alias/fallback " +
+			"chain (the multi_turn_tools capability marks affected models), or keep tool use single-turn.",
+		Raw: raw,
+	}
+}
+
+// Capabilities implements provider.ModelCapabilities: Gemini 3 models
+// validate thought signatures on function-call replay, which relay cannot
+// carry cross-dialect — multi-turn tool use is degraded (DESIGN §0.7).
+func (c *Client) Capabilities(model string) provider.Capabilities {
+	if strings.HasPrefix(model, "gemini-3") {
+		return provider.Capabilities{MultiTurnTools: provider.MultiTurnToolsDegraded}
+	}
+	return provider.Capabilities{}
 }
 
 func fromGeminiParts(parts []part, toolStart int) ([]core.Part, bool) {
@@ -598,10 +628,12 @@ func (c *Client) Models(ctx context.Context) ([]provider.Model, error) {
 	}
 	models := make([]provider.Model, 0, len(wire.Models))
 	for _, m := range wire.Models {
+		id := strings.TrimPrefix(m.Name, "models/")
 		models = append(models, provider.Model{
-			ID:       strings.TrimPrefix(m.Name, "models/"),
-			Provider: c.name,
-			OwnedBy:  "google",
+			ID:           id,
+			Provider:     c.name,
+			OwnedBy:      "google",
+			Capabilities: c.Capabilities(id),
 		})
 	}
 	return models, nil

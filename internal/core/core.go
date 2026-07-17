@@ -86,6 +86,25 @@ type Request struct {
 	Inbound            Dialect
 }
 
+// ToolReplayID returns the id of the earliest assistant tool call replayed
+// in the conversation history, and whether one exists. This is the request
+// shape that trips provider-side signature validation on models with
+// degraded multi-turn tools (DESIGN §0.7); the first replayed id is stable
+// for the life of a conversation, making it a usable warn-once key.
+func (r *Request) ToolReplayID() (string, bool) {
+	for _, m := range r.Messages {
+		if m.Role != RoleAssistant {
+			continue
+		}
+		for _, p := range m.Parts {
+			if tc, ok := p.(ToolCallPart); ok {
+				return tc.ID, true
+			}
+		}
+	}
+	return "", false
+}
+
 // BlockExt carries block-level dialect-specific fields (e.g. Anthropic
 // cache_control) for same-dialect passthrough. Dropping these silently on a
 // passthrough hop would break prompt caching, so they ride the IR.

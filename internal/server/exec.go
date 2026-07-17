@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -46,6 +47,30 @@ func routeFailure(err error) failure {
 	return failure{status: http.StatusBadGateway, code: "routing_error", msg: err.Error()}
 }
 
+// noteDegradedToolReplay is the warning half of DESIGN §0.7 condition 1:
+// when function-call replay is routed to a candidate with degraded
+// multi-turn tools, append the warning to the route reason (surfaced by the
+// dashboard's recent-decisions view) and log it once per conversation.
+func (rt *Runtime) noteDegradedToolReplay(p provider.Provider, cand router.Candidate, ir *core.Request, rec *store.Record) {
+	mc, ok := p.(provider.ModelCapabilities)
+	if !ok || mc.Capabilities(cand.Model).MultiTurnTools != provider.MultiTurnToolsDegraded {
+		return
+	}
+	replayID, replaying := ir.ToolReplayID()
+	if !replaying {
+		return
+	}
+	rec.RouteReason += " [warning: multi_turn_tools=degraded — thought-signature replay may be rejected; DESIGN §0.7]"
+	key := cand.Provider + "/" + cand.Model + "/" + replayID
+	if _, seen := rt.degradedWarned.LoadOrStore(key, struct{}{}); !seen {
+		log.Printf("warning: multi_turn_tools=degraded provider=%s model=%s tool_call=%s: "+
+			"this model validates thought signatures on function-call replay, which relay cannot carry "+
+			"cross-dialect (docs/quirks.md, DESIGN §0.7); alias/fallback multi-turn tool traffic to "+
+			"another provider or keep tool use single-turn",
+			cand.Provider, cand.Model, replayID)
+	}
+}
+
 // walkComplete walks the candidate chain for a non-streaming request.
 func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (*core.Response, failure) {
 	last := noProviderFailure
@@ -58,6 +83,7 @@ func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates
 		rec.Provider = cand.Provider
 		rec.ModelServed = cand.Model
 		rec.RouteReason = cand.Reason
+		rt.noteDegradedToolReplay(p, cand, ir, rec)
 
 		attempt := *ir
 		attempt.Model = cand.Model
@@ -87,6 +113,7 @@ func walkStream(ctx context.Context, rt *Runtime, ir *core.Request, candidates [
 		rec.Provider = cand.Provider
 		rec.ModelServed = cand.Model
 		rec.RouteReason = cand.Reason
+		rt.noteDegradedToolReplay(p, cand, ir, rec)
 
 		attempt := *ir
 		attempt.Model = cand.Model

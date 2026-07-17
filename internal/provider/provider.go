@@ -23,10 +23,32 @@ type Provider interface {
 
 // Model is one catalog entry.
 type Model struct {
-	ID       string
-	Provider string
-	Created  int64
-	OwnedBy  string
+	ID           string
+	Provider     string
+	Created      int64
+	OwnedBy      string
+	Capabilities Capabilities
+}
+
+// MultiTurnToolsDegraded marks models that validate provider-specific state
+// (e.g. thought signatures) on function-call replay, which a cross-dialect
+// gateway cannot carry: multi-turn tool use may be rejected upstream.
+// See DESIGN §0.7.
+const MultiTurnToolsDegraded = "degraded"
+
+// Capabilities is per-model capability metadata consulted by the router's
+// eligibility filter and the executor's diagnostics. The zero value means
+// "no known caveats". More fields join with the Phase 4 pricing registry;
+// built now per DESIGN §0.7 condition 2.
+type Capabilities struct {
+	// MultiTurnTools is "" (fine) or MultiTurnToolsDegraded.
+	MultiTurnTools string
+}
+
+// ModelCapabilities is an optional Provider extension. Providers that know
+// per-model caveats implement it; callers consult it via type assertion.
+type ModelCapabilities interface {
+	Capabilities(model string) Capabilities
 }
 
 // Error is a normalized upstream failure. Raw preserves the provider's

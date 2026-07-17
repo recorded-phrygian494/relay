@@ -129,15 +129,40 @@ own ids; the name-keyed mapping still works. Whether `functionResponse`
 accepts/validates an id on replay is unverified — revisit when tool-loop
 scenarios get recorded.
 
-### `thoughtSignature` on parts — recorded 2026-07-16, **known gap**
+### `thoughtSignature` on parts — recorded 2026-07-16; enforcement recorded 2026-07-16
 Gemini 3 models attach a `thoughtSignature` to text and `functionCall`
 parts (including a signature-only empty `text:""` part at stream end), and
-Google's docs require signatures to be returned on function-call replay in
-multi-turn conversations. The adapter currently drops them — same failure
-class as Anthropic's thinking signatures, but harder: the client replays
-history in *its* dialect, which has nowhere to carry a Gemini signature
-through a stateless gateway. Multi-turn tool use against Gemini 3 models
-may fail signature validation. Decision needed: DESIGN §0.7.
+signatures MUST be returned on function-call replay in multi-turn
+conversations — verified live, not just docs: replaying a recorded
+`functionCall` without its signature is a 400 `INVALID_ARGUMENT`
+("Function call is missing a thought_signature in functionCall parts...",
+fixture: `recorded/missing_thought_signature/`); the identical replay with
+the signature attached succeeds (fixture: `recorded/tool_replay/`). Same
+failure class as Anthropic's thinking signatures, but harder: the client
+replays history in *its* dialect, which has nowhere to carry a Gemini
+signature through a stateless gateway.
+**Handling (DESIGN §0.7, resolved 2026-07-17):** documented v1 limitation.
+The adapter maps the validation 400 to the typed error
+`gemini_missing_thought_signature` naming the limitation and workarounds,
+and the gateway logs a structured warning (also appended to the route
+reason) when it routes function-call replay to a Gemini 3 target. The
+`multi_turn_tools: degraded` capability flag lets routing steer such
+traffic elsewhere.
+
+### OpenAI-compat endpoint (`/v1beta/openai/`) — recorded 2026-07-16
+Google's own OpenAI-compatibility layer does not absorb the
+thought-signature problem: it surfaces the signature in a nonstandard
+`tool_calls[].extra_content.google.thought_signature` field (and
+`message.extra_content` for text turns), and replaying an assistant
+tool-call message without that field fails with the identical
+missing-thought-signature 400. Standard OpenAI SDK object models drop
+unknown fields, so typical clients hit the wall even through Google's own
+compat layer. Two extra quirks: error bodies from the compat endpoint are
+wrapped in a JSON **array** (`[{"error": {...}}]` — an `{"error":...}`
+parser must unwrap it), and tool-call ids are 8-char opaque strings, not
+OpenAI-style `call_*`. Fixtures: `internal/translate/testdata/googlecompat/`.
+**Handling:** none yet — no google preset profile exists for the
+openaicompat adapter; these recordings are its ground truth when it lands.
 
 ### Streaming shape — recorded 2026-07-16
 Cumulative `usageMetadata` arrives on **every** chunk, not just the last;
