@@ -62,11 +62,51 @@ func TestLoadRejectsBadConfig(t *testing.T) {
 		"unknown route provider": "providers:\n  openai: {}\nrouting:\n  static:\n    fast: nope/model\n",
 		"unknown log_prompts":   "logging:\n  log_prompts: everything\n",
 		"unknown yaml field":    "servers:\n  listen: x\n",
+		"alias unknown policy":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: smartest, candidates: [openai/gpt-4o]}\n",
+		"alias empty":           "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: cheapest}\n",
+		"alias bad target":      "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: [nowhere/model]\n",
+		"weighted no children":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: weighted, candidates: [openai/a]}\n",
+		"weighted zero weight":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x:\n      policy: weighted\n      children: [{target: openai/a, weight: 0}]\n",
 	}
 	for name, content := range cases {
 		if _, err := Load(writeConfig(t, content)); err == nil {
 			t.Errorf("%s: want error, got nil", name)
 		}
+	}
+}
+
+func TestAliasShapes(t *testing.T) {
+	cfg, err := Load(writeConfig(t, `
+providers:
+  openai: {}
+  ollama: {}
+routing:
+  aliases:
+    fast: [openai/gpt-4o-mini, ollama/llama3]
+    cheap: {policy: cheapest, candidates: [ollama/llama3, openai/gpt-4o-mini]}
+    smart: [cheap, openai/gpt-5]
+    canary:
+      policy: weighted
+      children:
+        - {target: openai/gpt-4o, weight: 95}
+        - {target: ollama/llama3, weight: 5}
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := cfg.Routing.Aliases["fast"].Candidates; len(got) != 2 || got[0] != "openai/gpt-4o-mini" {
+		t.Fatalf("list shorthand: %+v", got)
+	}
+	if cfg.Routing.Aliases["cheap"].Policy != "cheapest" {
+		t.Fatalf("policy mapping: %+v", cfg.Routing.Aliases["cheap"])
+	}
+	// "cheap" inside smart's chain is accepted as an alias reference.
+	if got := cfg.Routing.Aliases["smart"].Candidates; got[0] != "cheap" {
+		t.Fatalf("alias ref: %+v", got)
+	}
+	canary := cfg.Routing.Aliases["canary"]
+	if len(canary.Children) != 2 || canary.Children[0].Weight != 95 {
+		t.Fatalf("weighted children: %+v", canary.Children)
 	}
 }
 

@@ -75,11 +75,41 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		Providers: providers,
 		catalog:   newCatalogCache(providers, 5*time.Minute),
 	}
-	rt.Router = &router.Static{
+	static := &router.Static{
 		Routes:          cfg.Routing.Static,
 		HasProvider:     func(name string) bool { _, ok := providers[name]; return ok },
 		Catalog:         rt.catalog.ByModel,
 		DefaultProvider: cfg.Routing.DefaultProvider,
+	}
+	if len(cfg.Routing.Aliases) == 0 {
+		rt.Router = static
+		return rt, nil
+	}
+
+	specs := make(map[string]router.AliasSpec, len(cfg.Routing.Aliases))
+	for name, a := range cfg.Routing.Aliases {
+		spec := router.AliasSpec{Policy: a.Policy, Targets: a.Candidates}
+		for _, ch := range a.Children {
+			spec.Targets = append(spec.Targets, ch.Target)
+			spec.Weights = append(spec.Weights, ch.Weight)
+		}
+		specs[name] = spec
+	}
+	// Pricing and stats land later in phase 3; until then cheapest/fastest
+	// degrade to declared order / exploration, stated in their reasons.
+	table, err := router.CompileAliases(specs, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("routing.aliases: %w", err)
+	}
+	rt.Router = &router.Aliases{
+		Table: table,
+		Inner: static,
+		Filter: &router.Eligibility{Caps: func(providerName, model string) provider.Capabilities {
+			if mc, ok := providers[providerName].(provider.ModelCapabilities); ok {
+				return mc.Capabilities(model)
+			}
+			return provider.Capabilities{}
+		}},
 	}
 	return rt, nil
 }

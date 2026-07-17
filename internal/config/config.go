@@ -47,12 +47,53 @@ type Provider struct {
 	Headers map[string]string `yaml:"headers"`
 }
 
-// Routing configures the routing policy. Phase 1: static only.
+// Routing configures the routing policy.
 type Routing struct {
 	// Static maps a requested model name to "provider/model".
 	Static map[string]string `yaml:"static"`
 	// DefaultProvider serves otherwise-unresolved model names.
 	DefaultProvider string `yaml:"default_provider"`
+	// Aliases are virtual model names: a plain list is a fallback chain; a
+	// mapping selects a policy (DESIGN §7/§8).
+	Aliases map[string]Alias `yaml:"aliases"`
+}
+
+// Alias is one virtual model. Two YAML shapes are accepted:
+//
+//	fast: [groq/llama-3.3-70b, openai/gpt-4o-mini]        # fallback chain
+//	cheap: {policy: cheapest, candidates: [a/x, b/y]}
+//	canary:
+//	  policy: weighted
+//	  children: [{target: openai/gpt-4o, weight: 95}, {target: local/m, weight: 5}]
+type Alias struct {
+	Policy     string          `yaml:"policy"`
+	Candidates StringList      `yaml:"candidates"`
+	Children   []WeightedChild `yaml:"children"`
+}
+
+// WeightedChild is one branch of a weighted split.
+type WeightedChild struct {
+	Target string `yaml:"target"`
+	Weight int    `yaml:"weight"`
+}
+
+// UnmarshalYAML accepts the list shorthand or the policy mapping.
+func (a *Alias) UnmarshalYAML(node *yaml.Node) error {
+	if node.Kind == yaml.SequenceNode {
+		var targets []string
+		if err := node.Decode(&targets); err != nil {
+			return err
+		}
+		*a = Alias{Candidates: targets}
+		return nil
+	}
+	type plain Alias // drop the method to avoid recursion
+	var p plain
+	if err := node.Decode(&p); err != nil {
+		return err
+	}
+	*a = Alias(p)
+	return nil
 }
 
 // Logging configures the local SQLite request log.
@@ -60,6 +101,19 @@ type Logging struct {
 	DB string `yaml:"db"`
 	// LogPrompts: "off" (default) | "embeddings" | "full" (DESIGN §8).
 	LogPrompts string `yaml:"log_prompts"`
+}
+
+// targets returns every raw target string an alias references, whichever
+// shape it was declared in.
+func (a Alias) targets() []string {
+	if len(a.Children) > 0 {
+		out := make([]string, 0, len(a.Children))
+		for _, ch := range a.Children {
+			out = append(out, ch.Target)
+		}
+		return out
+	}
+	return a.Candidates
 }
 
 // StringList decodes a YAML scalar or sequence into a slice.
@@ -219,6 +273,46 @@ func (c *Config) finalize() error {
 		}
 		if _, exists := c.Providers[prov]; !exists {
 			return fmt.Errorf("routing.static.%s: unknown provider %q", alias, prov)
+		}
+	}
+	for name, a := range c.Routing.Aliases {
+		switch a.Policy {
+		case "", "fallback", "cheapest", "fastest":
+			if len(a.Children) > 0 {
+				return fmt.Errorf("routing.aliases.%s: children is only for policy weighted", name)
+			}
+			if len(a.Candidates) == 0 {
+				return fmt.Errorf("routing.aliases.%s: no candidates", name)
+			}
+		case "weighted":
+			if len(a.Candidates) > 0 {
+				return fmt.Errorf("routing.aliases.%s: weighted takes children, not candidates", name)
+			}
+			if len(a.Children) == 0 {
+				return fmt.Errorf("routing.aliases.%s: weighted needs children", name)
+			}
+			for i, ch := range a.Children {
+				if ch.Target == "" {
+					return fmt.Errorf("routing.aliases.%s.children[%d]: missing target", name, i)
+				}
+				if ch.Weight <= 0 {
+					return fmt.Errorf("routing.aliases.%s.children[%d]: weight must be positive", name, i)
+				}
+			}
+		default:
+			return fmt.Errorf("routing.aliases.%s: unknown policy %q (want fallback | cheapest | fastest | weighted)", name, a.Policy)
+		}
+		for _, raw := range a.targets() {
+			prov, _, ok := strings.Cut(raw, "/")
+			if ok {
+				if _, exists := c.Providers[prov]; exists {
+					continue
+				}
+			}
+			if _, isAlias := c.Routing.Aliases[raw]; isAlias {
+				continue // alias reference; cycles are caught at compile
+			}
+			return fmt.Errorf("routing.aliases.%s: target %q is neither provider/model nor a known alias", name, raw)
 		}
 	}
 	if dp := c.Routing.DefaultProvider; dp != "" {
