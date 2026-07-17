@@ -13,6 +13,7 @@ import (
 
 	"github.com/llmrelay/relay/internal/config"
 	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/reliability"
 	"github.com/llmrelay/relay/internal/provider/anthropicprov"
 	"github.com/llmrelay/relay/internal/provider/gemini"
 	"github.com/llmrelay/relay/internal/provider/ollama"
@@ -28,11 +29,13 @@ type Runtime struct {
 	Config    *config.Config
 	Providers map[string]provider.Provider
 	Router    router.Router
+	Exec      *reliability.Executor
 	catalog   *catalogCache
 
 	// degradedWarned dedupes the DESIGN §0.7 multi_turn_tools warning:
 	// one log line per conversation, keyed by candidate + first replayed
-	// tool-call id. Reset on hot reload, which is acceptable.
+	// tool-call id. Reset on hot reload, which is acceptable — as is
+	// resetting breaker and key-cooldown state with the Executor.
 	degradedWarned sync.Map
 }
 
@@ -75,6 +78,18 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		Providers: providers,
 		catalog:   newCatalogCache(providers, 5*time.Minute),
 	}
+	pools := make(map[string]*reliability.KeyPool)
+	for name, pc := range cfg.Providers {
+		if pool := reliability.NewKeyPool(pc.APIKey); pool != nil {
+			pools[name] = pool
+		}
+	}
+	rt.Exec = reliability.NewExecutor(
+		func(name string) (provider.Provider, bool) { p, ok := providers[name]; return p, ok },
+		pools,
+		cfg.Reliability.RetryCount(),
+		cfg.Reliability.TTFTTimeout.Std(),
+	)
 	static := &router.Static{
 		Routes:          cfg.Routing.Static,
 		HasProvider:     func(name string) bool { _, ok := providers[name]; return ok },

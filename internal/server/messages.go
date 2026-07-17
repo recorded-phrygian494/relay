@@ -71,7 +71,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), requestTimeout(ir.Stream))
+	ctx, cancel := context.WithTimeout(r.Context(), rt.requestTimeout(ir.Stream))
 	defer cancel()
 
 	rec.RoutePolicy = rt.Router.Name()

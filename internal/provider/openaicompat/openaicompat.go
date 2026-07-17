@@ -65,8 +65,8 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body []byt
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	if c.cfg.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.cfg.APIKey)
+	if key := provider.APIKey(ctx, c.cfg.APIKey); key != "" {
+		req.Header.Set("Authorization", "Bearer "+key)
 	}
 	for k, v := range c.cfg.Headers {
 		req.Header.Set(k, v)

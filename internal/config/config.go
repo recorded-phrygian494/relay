@@ -19,10 +19,11 @@ import (
 
 // Config is the root of relay.yaml.
 type Config struct {
-	Server    Server              `yaml:"server"`
-	Providers map[string]Provider `yaml:"providers"`
-	Routing   Routing             `yaml:"routing"`
-	Logging   Logging             `yaml:"logging"`
+	Server      Server              `yaml:"server"`
+	Providers   map[string]Provider `yaml:"providers"`
+	Routing     Routing             `yaml:"routing"`
+	Logging     Logging             `yaml:"logging"`
+	Reliability Reliability         `yaml:"reliability"`
 
 	// Path is the file this config was loaded from; empty for zero-config.
 	Path string `yaml:"-"`
@@ -94,6 +95,45 @@ func (a *Alias) UnmarshalYAML(node *yaml.Node) error {
 	}
 	*a = Alias(p)
 	return nil
+}
+
+// Duration decodes yaml scalars like "30s" / "5m".
+type Duration time.Duration
+
+// UnmarshalYAML implements yaml.Unmarshaler.
+func (d *Duration) UnmarshalYAML(node *yaml.Node) error {
+	var s string
+	if err := node.Decode(&s); err != nil {
+		return err
+	}
+	v, err := time.ParseDuration(s)
+	if err != nil {
+		return fmt.Errorf("invalid duration %q: %w", s, err)
+	}
+	*d = Duration(v)
+	return nil
+}
+
+// Std converts to time.Duration.
+func (d Duration) Std() time.Duration { return time.Duration(d) }
+
+// Reliability tunes the executor (DESIGN §6/§8).
+type Reliability struct {
+	// Retries is the per-candidate retry budget for retryable errors.
+	Retries *int `yaml:"retries"`
+	// TTFTTimeout bounds the wait for a stream's first content event.
+	TTFTTimeout Duration `yaml:"ttft_timeout"`
+	// RequestTimeout is the whole-chain budget for streaming requests;
+	// non-streaming requests get half of it.
+	RequestTimeout Duration `yaml:"request_timeout"`
+}
+
+// RetryCount applies the default of 3.
+func (r Reliability) RetryCount() int {
+	if r.Retries == nil {
+		return 3
+	}
+	return *r.Retries
 }
 
 // Logging configures the local SQLite request log.

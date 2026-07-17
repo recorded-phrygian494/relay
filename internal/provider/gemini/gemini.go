@@ -354,7 +354,7 @@ func (c *Client) post(ctx context.Context, path string, body any, stream bool) (
 		return nil, err
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("x-goog-api-key", c.apiKey)
+	httpReq.Header.Set("x-goog-api-key", provider.APIKey(ctx, c.apiKey))
 	if stream {
 		httpReq.Header.Set("Accept", "text/event-stream")
 	}

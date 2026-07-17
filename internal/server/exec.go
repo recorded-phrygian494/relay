@@ -10,6 +10,7 @@ import (
 
 	"github.com/llmrelay/relay/internal/core"
 	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/reliability"
 	"github.com/llmrelay/relay/internal/router"
 	"github.com/llmrelay/relay/internal/store"
 )
@@ -71,63 +72,49 @@ func (rt *Runtime) noteDegradedToolReplay(p provider.Provider, cand router.Candi
 	}
 }
 
-// walkComplete walks the candidate chain for a non-streaming request.
-func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (*core.Response, failure) {
-	last := noProviderFailure
-	for _, cand := range candidates {
-		p, ok := rt.Providers[cand.Provider]
-		if !ok {
-			continue
-		}
+// onAttempt bridges executor attempts into the request record and the
+// DESIGN §0.7 degraded-tools warning.
+func onAttempt(rt *Runtime, ir *core.Request, rec *store.Record) func(cand router.Candidate) {
+	return func(cand router.Candidate) {
 		rec.Attempts++
 		rec.Provider = cand.Provider
 		rec.ModelServed = cand.Model
 		rec.RouteReason = cand.Reason
-		rt.noteDegradedToolReplay(p, cand, ir, rec)
-
-		attempt := *ir
-		attempt.Model = cand.Model
-		resp, err := p.Complete(ctx, &attempt)
-		if err == nil {
-			return resp, failure{}
-		}
-		var retry bool
-		last, retry = classify(err)
-		if !retry || ctx.Err() != nil {
-			break
+		if p, ok := rt.Providers[cand.Provider]; ok {
+			rt.noteDegradedToolReplay(p, cand, ir, rec)
 		}
 	}
-	return nil, last
 }
 
-// walkStream walks the chain until a stream is successfully opened. Failover
-// happens only here — before any byte reaches the client (DESIGN §6).
-func walkStream(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (core.Stream, failure) {
-	last := noProviderFailure
-	for _, cand := range candidates {
-		p, ok := rt.Providers[cand.Provider]
-		if !ok {
-			continue
-		}
-		rec.Attempts++
-		rec.Provider = cand.Provider
-		rec.ModelServed = cand.Model
-		rec.RouteReason = cand.Reason
-		rt.noteDegradedToolReplay(p, cand, ir, rec)
-
-		attempt := *ir
-		attempt.Model = cand.Model
-		st, err := p.Stream(ctx, &attempt)
-		if err == nil {
-			return st, failure{}
-		}
-		var retry bool
-		last, retry = classify(err)
-		if !retry || ctx.Err() != nil {
-			break
-		}
+func execFailure(err error) failure {
+	if errors.Is(err, reliability.ErrNoCandidate) {
+		return noProviderFailure
 	}
-	return nil, last
+	if errors.Is(err, context.DeadlineExceeded) {
+		return failure{status: http.StatusGatewayTimeout, code: "request_timeout", msg: "request budget exhausted before any candidate answered"}
+	}
+	f, _ := classify(err)
+	return f
+}
+
+// walkComplete runs the chain through the reliability executor.
+func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (*core.Response, failure) {
+	resp, err := rt.Exec.Complete(ctx, ir, candidates, onAttempt(rt, ir, rec))
+	if err != nil {
+		return nil, execFailure(err)
+	}
+	return resp, failure{}
+}
+
+// walkStream runs the chain through the reliability executor. Failover
+// happens only before the first content event reaches the client
+// (DESIGN §6): the executor holds the stream back until content arrives.
+func walkStream(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (core.Stream, failure) {
+	st, err := rt.Exec.Stream(ctx, ir, candidates, onAttempt(rt, ir, rec))
+	if err != nil {
+		return nil, execFailure(err)
+	}
+	return st, failure{}
 }
 
 // eventWriter is the dialect-specific streaming renderer; both the OpenAI
@@ -170,8 +157,16 @@ func pumpStream(stream core.Stream, w eventWriter, rec *store.Record) {
 	}
 }
 
-// requestTimeout picks the per-request budget.
-func requestTimeout(stream bool) time.Duration {
+// requestTimeout picks the per-request budget, shared across the whole
+// candidate chain (DESIGN §6). Configured request_timeout governs streams;
+// non-streaming requests get half of it.
+func (rt *Runtime) requestTimeout(stream bool) time.Duration {
+	if cfgd := rt.Config.Reliability.RequestTimeout.Std(); cfgd > 0 {
+		if stream {
+			return cfgd
+		}
+		return cfgd / 2
+	}
 	if stream {
 		return defaultStreamTimeout
 	}

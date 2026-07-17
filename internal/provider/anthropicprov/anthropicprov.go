@@ -103,7 +103,7 @@ func (c *Client) do(ctx context.Context, path string, wire any, stream bool) (*h
 		return nil, err
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("x-api-key", c.apiKey)
+	httpReq.Header.Set("x-api-key", provider.APIKey(ctx, c.apiKey))
 	httpReq.Header.Set("anthropic-version", apiVersion)
 	if stream {
 		httpReq.Header.Set("Accept", "text/event-stream")

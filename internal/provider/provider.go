@@ -13,6 +13,24 @@ import (
 	"github.com/llmrelay/relay/internal/core"
 )
 
+// apiKeyCtx keys the per-attempt API-key override.
+type apiKeyCtx struct{}
+
+// WithAPIKey selects the API key for one attempt. The reliability
+// executor's key pool sets it; adapters fall back to their configured key
+// when absent (DESIGN §6: the executor picks keys, adapters stay dumb).
+func WithAPIKey(ctx context.Context, key string) context.Context {
+	return context.WithValue(ctx, apiKeyCtx{}, key)
+}
+
+// APIKey returns the key an adapter should use for this attempt.
+func APIKey(ctx context.Context, configured string) string {
+	if k, ok := ctx.Value(apiKeyCtx{}).(string); ok && k != "" {
+		return k
+	}
+	return configured
+}
+
 // Provider is one configured upstream.
 type Provider interface {
 	Name() string
