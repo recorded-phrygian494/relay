@@ -28,6 +28,8 @@ Usage:
   relay [serve]           run the gateway (default)
   relay init              scaffold a relay.yaml
   relay stats             traffic summary from the local request log
+  relay eval              routing eval harness: smart vs static on cost + quality (§0.3)
+  relay train             build/update the smart-routing reference set from your own logs
   relay pricing update    refresh the pricing registry (explicit only, never automatic)
   relay pricing show      print the active pricing registry source
   relay version           print the version
@@ -53,6 +55,10 @@ func main() {
 		err = runInit(args)
 	case "stats":
 		err = runStats(args)
+	case "eval":
+		err = runEval(args)
+	case "train":
+		err = runTrain(args)
 	case "pricing":
 		err = runPricing(args)
 	case "version":

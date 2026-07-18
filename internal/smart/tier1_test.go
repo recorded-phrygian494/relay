@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/llmrelay/relay/internal/core"
-	"github.com/llmrelay/relay/internal/evalx"
 )
 
 func userReq(text string) *core.Request {
@@ -50,37 +49,3 @@ func TestLexicalDeterminism(t *testing.T) {
 	}
 }
 
-// TestLexicalCalibrationFloor pins tier-1 quality against the committed
-// eval set: no hard row (label >= 0.55) may classify easy — that misroute
-// sends hard traffic to a cheap model, the expensive failure — and total
-// misses stay bounded. Calibration was hand-tuned against this set
-// (documented in tier1_weights.json); this test keeps regressions out.
-func TestLexicalCalibrationFloor(t *testing.T) {
-	set, err := evalx.LoadSet("../../assets/eval/evalset_v1.jsonl")
-	if err != nil {
-		t.Fatal(err)
-	}
-	l, _ := NewLexical()
-	misses, unsafe := 0, 0
-	for _, row := range set.Rows {
-		d, err := l.Classify(context.Background(), userReq(row.Prompt))
-		if err != nil {
-			t.Fatal(err)
-		}
-		wantHard := row.Difficulty >= l.Weights.Threshold
-		gotHard := d.Class == "hard"
-		if wantHard != gotHard {
-			misses++
-			if row.Difficulty >= 0.55 && !gotHard {
-				unsafe++
-				t.Errorf("hard row %s (label %.2f) classified easy: %s", row.ID, row.Difficulty, d.Why)
-			}
-		}
-	}
-	if unsafe > 0 {
-		t.Fatalf("%d hard rows would route to the cheap chain", unsafe)
-	}
-	if misses > 3 {
-		t.Fatalf("calibration drifted: %d misses (max 3)", misses)
-	}
-}

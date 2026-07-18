@@ -190,9 +190,11 @@ func buildSmartRouter(cfg *config.Config, providers map[string]provider.Provider
 	}
 	var classifier smart.Classifier = lex
 
-	// The default tier is a §0.3 launch-gate decision: it may only be
-	// "lexical" if relay eval proved tier 1 beats static on cost at equal
-	// quality. GATE-PENDING: resolved by the phase-4 eval run.
+	// The default tier is a §0.3 launch-gate decision: "lexical" only
+	// because relay eval proved tier 1 beats static-frontier on cost at
+	// equal quality (2026-07-18, eval set v1: quality −0.017 within the
+	// 0.020 tolerance, cost −18%). If the set or weights change, re-run
+	// the gate before trusting this default.
 	tier := cfg.Routing.Smart.Tier
 	if tier == "" {
 		tier = "lexical"

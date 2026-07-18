@@ -1,0 +1,3047 @@
+{
+ "set": "assets/eval/evalset_v1.jsonl",
+ "set_version": "v1",
+ "seed": 1,
+ "candidates": {
+  "cheap": {
+   "provider": "gemini",
+   "model": "gemini-3.1-flash-lite",
+   "band": "cheap",
+   "in_per_mtok": 0.25,
+   "out_per_mtok": 1.5
+  },
+  "frontier": {
+   "provider": "anthropic",
+   "model": "claude-fable-5",
+   "band": "frontier",
+   "in_per_mtok": 10,
+   "out_per_mtok": 50
+  },
+  "mid": {
+   "provider": "gemini",
+   "model": "gemini-3.5-flash",
+   "band": "mid",
+   "in_per_mtok": 1.5,
+   "out_per_mtok": 9
+  }
+ },
+ "results": [
+  {
+   "policy": "static-cheap",
+   "cost_usd": 0.01461975,
+   "mean_quality": 0.7617551020408162,
+   "routed_by_band": {
+    "cheap": 49
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.00005225,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.913,
+     "cost_usd": 0.00005825,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.924,
+     "cost_usd": 0.000035,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.929,
+     "cost_usd": 0.0000515,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.95,
+     "cost_usd": 0.00011625,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.932,
+     "cost_usd": 0.00005775,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.921,
+     "cost_usd": 0.00004475,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.934,
+     "cost_usd": 0.00007675,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.928,
+     "cost_usd": 0.000146,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.892,
+     "cost_usd": 0.00013275,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.887,
+     "cost_usd": 0.0001105,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.94,
+     "cost_usd": 0.00005,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.878,
+     "cost_usd": 0.00017425,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.916,
+     "cost_usd": 0.0000885,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.949,
+     "cost_usd": 0.00013175,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.89,
+     "cost_usd": 0.00016425,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.823,
+     "cost_usd": 0.00010125,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.888,
+     "cost_usd": 0.00015025,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.842,
+     "cost_usd": 0.00016975,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.875,
+     "cost_usd": 0.00024025,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.873,
+     "cost_usd": 0.0001685,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.839,
+     "cost_usd": 0.0002285,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.775,
+     "cost_usd": 0.000192,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.751,
+     "cost_usd": 0.0001505,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.794,
+     "cost_usd": 0.00022525,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.775,
+     "cost_usd": 0.00026975,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.642,
+     "cost_usd": 0.0002425,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.694,
+     "cost_usd": 0.00053,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.718,
+     "cost_usd": 0.0005135,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.709,
+     "cost_usd": 0.0007385,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.689,
+     "cost_usd": 0.00032575,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.675,
+     "cost_usd": 0.0005975,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.557,
+     "cost_usd": 0.000493,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.665,
+     "cost_usd": 0.00032825,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.647,
+     "cost_usd": 0.00051525,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.545,
+     "cost_usd": 0.000519,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.646,
+     "cost_usd": 0.00024325,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.59,
+     "cost_usd": 0.00024875,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.576,
+     "cost_usd": 0.00056375,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.494,
+     "cost_usd": 0.0007415,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.44,
+     "cost_usd": 0.00057375,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.432,
+     "cost_usd": 0.00083525,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.587,
+     "cost_usd": 0.00086375,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.567,
+     "cost_usd": 0.00068825,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.528,
+     "cost_usd": 0.00047775,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.528,
+     "cost_usd": 0.0003295,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.583,
+     "cost_usd": 0.0006995,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.000086,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.922,
+     "cost_usd": 0.000079,
+     "reason": "static: always gemini/gemini-3.1-flash-lite",
+     "label_difficulty": 0.115
+    }
+   ]
+  },
+  {
+   "policy": "cheapest",
+   "cost_usd": 0.01461975,
+   "mean_quality": 0.7617551020408162,
+   "routed_by_band": {
+    "cheap": 49
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.00005225,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.913,
+     "cost_usd": 0.00005825,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.924,
+     "cost_usd": 0.000035,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.929,
+     "cost_usd": 0.0000515,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.95,
+     "cost_usd": 0.00011625,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.932,
+     "cost_usd": 0.00005775,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.921,
+     "cost_usd": 0.00004475,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.934,
+     "cost_usd": 0.00007675,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.928,
+     "cost_usd": 0.000146,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.892,
+     "cost_usd": 0.00013275,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.887,
+     "cost_usd": 0.0001105,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.94,
+     "cost_usd": 0.00005,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.878,
+     "cost_usd": 0.00017425,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.916,
+     "cost_usd": 0.0000885,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.949,
+     "cost_usd": 0.00013175,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.89,
+     "cost_usd": 0.00016425,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.823,
+     "cost_usd": 0.00010125,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.888,
+     "cost_usd": 0.00015025,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.842,
+     "cost_usd": 0.00016975,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.875,
+     "cost_usd": 0.00024025,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.873,
+     "cost_usd": 0.0001685,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.839,
+     "cost_usd": 0.0002285,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.775,
+     "cost_usd": 0.000192,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.751,
+     "cost_usd": 0.0001505,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.794,
+     "cost_usd": 0.00022525,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.775,
+     "cost_usd": 0.00026975,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.642,
+     "cost_usd": 0.0002425,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.694,
+     "cost_usd": 0.00053,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.718,
+     "cost_usd": 0.0005135,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.709,
+     "cost_usd": 0.0007385,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.689,
+     "cost_usd": 0.00032575,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.675,
+     "cost_usd": 0.0005975,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.557,
+     "cost_usd": 0.000493,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.665,
+     "cost_usd": 0.00032825,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.647,
+     "cost_usd": 0.00051525,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.545,
+     "cost_usd": 0.000519,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.646,
+     "cost_usd": 0.00024325,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.59,
+     "cost_usd": 0.00024875,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.576,
+     "cost_usd": 0.00056375,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.494,
+     "cost_usd": 0.0007415,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.44,
+     "cost_usd": 0.00057375,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.432,
+     "cost_usd": 0.00083525,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.587,
+     "cost_usd": 0.00086375,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.567,
+     "cost_usd": 0.00068825,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.528,
+     "cost_usd": 0.00047775,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.528,
+     "cost_usd": 0.0003295,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.583,
+     "cost_usd": 0.0006995,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.000086,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.922,
+     "cost_usd": 0.000079,
+     "reason": "cheapest: gemini/gemini-3.1-flash-lite by blended price",
+     "label_difficulty": 0.115
+    }
+   ]
+  },
+  {
+   "policy": "static-mid",
+   "cost_usd": 0.0877185,
+   "mean_quality": 0.8350408163265306,
+   "routed_by_band": {
+    "mid": 49
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.934,
+     "cost_usd": 0.0003135,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.918,
+     "cost_usd": 0.0003495,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.935,
+     "cost_usd": 0.00021,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.948,
+     "cost_usd": 0.000309,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.963,
+     "cost_usd": 0.0006975,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.961,
+     "cost_usd": 0.0003465,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.943,
+     "cost_usd": 0.0002685,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.96,
+     "cost_usd": 0.0004605,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.925,
+     "cost_usd": 0.000876,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.928,
+     "cost_usd": 0.0007965,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.882,
+     "cost_usd": 0.000663,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.927,
+     "cost_usd": 0.0003,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.905,
+     "cost_usd": 0.0010455,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.941,
+     "cost_usd": 0.000531,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.955,
+     "cost_usd": 0.0007905,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.914,
+     "cost_usd": 0.0009855,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.898,
+     "cost_usd": 0.0006075,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.888,
+     "cost_usd": 0.0009015,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.888,
+     "cost_usd": 0.0010185,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.901,
+     "cost_usd": 0.0014415,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.903,
+     "cost_usd": 0.001011,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.87,
+     "cost_usd": 0.001371,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.834,
+     "cost_usd": 0.001152,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.842,
+     "cost_usd": 0.000903,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.878,
+     "cost_usd": 0.0013515,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.854,
+     "cost_usd": 0.0016185,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.772,
+     "cost_usd": 0.001455,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.783,
+     "cost_usd": 0.00318,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.778,
+     "cost_usd": 0.003081,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.783,
+     "cost_usd": 0.004431,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.797,
+     "cost_usd": 0.0019545,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.758,
+     "cost_usd": 0.003585,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.72,
+     "cost_usd": 0.002958,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.756,
+     "cost_usd": 0.0019695,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.756,
+     "cost_usd": 0.0030915,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.71,
+     "cost_usd": 0.003114,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.759,
+     "cost_usd": 0.0014595,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.721,
+     "cost_usd": 0.0014925,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.72,
+     "cost_usd": 0.0033825,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.667,
+     "cost_usd": 0.004449,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.67,
+     "cost_usd": 0.0034425,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.636,
+     "cost_usd": 0.0050115,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.727,
+     "cost_usd": 0.0051825,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.734,
+     "cost_usd": 0.0041295,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.679,
+     "cost_usd": 0.0028665,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.678,
+     "cost_usd": 0.001977,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.722,
+     "cost_usd": 0.004197,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.941,
+     "cost_usd": 0.000516,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "gemini",
+     "model": "gemini-3.5-flash",
+     "band": "mid",
+     "quality": 0.955,
+     "cost_usd": 0.000474,
+     "reason": "static: always gemini/gemini-3.5-flash",
+     "label_difficulty": 0.115
+    }
+   ]
+  },
+  {
+   "policy": "smart-tier2",
+   "cost_usd": 0.36012724999999995,
+   "mean_quality": 0.8848367346938776,
+   "routed_by_band": {
+    "cheap": 26,
+    "frontier": 23
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.00005225,
+     "reason": "knn: 5 neighbors [seed-chat-01 d=0.08 sim=0.53; seed-chat-02 d=0.06 sim=0.50; seed-easy-long-02 d=0.10 sim=0.47; seed-easy-long-01 d=0.10 sim=0.44; seed-sum-02 d=0.42 sim=0.42] → difficulty 0.14 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.913,
+     "cost_usd": 0.00005825,
+     "reason": "knn: 5 neighbors [seed-chat-01 d=0.08 sim=0.69; seed-chat-05 d=0.15 sim=0.48; seed-chat-02 d=0.06 sim=0.45; seed-easy-long-01 d=0.10 sim=0.42; seed-easy-long-02 d=0.10 sim=0.41] → difficulty 0.10 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.924,
+     "cost_usd": 0.000035,
+     "reason": "knn: 5 neighbors [seed-easy-long-01 d=0.10 sim=0.45; seed-code-05 d=0.55 sim=0.44; seed-sum-03 d=0.45 sim=0.44; seed-chat-03 d=0.18 sim=0.43; seed-reason-01 d=0.82 sim=0.43] → difficulty 0.42 (easy, conf 0.57, threshold 0.45)",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.929,
+     "cost_usd": 0.0000515,
+     "reason": "knn: 5 neighbors [seed-chat-02 d=0.06 sim=0.53; seed-qa-04 d=0.24 sim=0.45; seed-easy-long-02 d=0.10 sim=0.44; seed-reason-01 d=0.82 sim=0.41; seed-hard-short-02 d=0.80 sim=0.40] → difficulty 0.38 (easy, conf 0.65, threshold 0.45)",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.95,
+     "cost_usd": 0.00011625,
+     "reason": "knn: 5 neighbors [seed-chat-03 d=0.18 sim=0.55; seed-chat-05 d=0.15 sim=0.53; seed-easy-long-02 d=0.10 sim=0.53; seed-chat-01 d=0.08 sim=0.52; seed-chat-02 d=0.06 sim=0.52] → difficulty 0.11 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.932,
+     "cost_usd": 0.00005775,
+     "reason": "knn: 5 neighbors [seed-chat-01 d=0.08 sim=0.55; seed-chat-05 d=0.15 sim=0.50; seed-easy-long-01 d=0.10 sim=0.46; seed-extract-04 d=0.30 sim=0.44; seed-code-05 d=0.55 sim=0.43] → difficulty 0.22 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.921,
+     "cost_usd": 0.00004475,
+     "reason": "knn: 5 neighbors [seed-reason-04 d=0.66 sim=0.54; seed-chat-03 d=0.18 sim=0.51; seed-math-01 d=0.35 sim=0.50; seed-chat-05 d=0.15 sim=0.50; seed-sum-01 d=0.38 sim=0.48] → difficulty 0.35 (easy, conf 0.70, threshold 0.45)",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.934,
+     "cost_usd": 0.00007675,
+     "reason": "knn: 5 neighbors [seed-easy-long-02 d=0.10 sim=0.58; seed-chat-04 d=0.12 sim=0.50; seed-chat-02 d=0.06 sim=0.44; seed-reason-01 d=0.82 sim=0.44; seed-chat-03 d=0.18 sim=0.43] → difficulty 0.24 (easy, conf 0.91, threshold 0.45)",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.928,
+     "cost_usd": 0.000146,
+     "reason": "knn: 5 neighbors [seed-extract-02 d=0.22 sim=0.51; seed-qa-01 d=0.15 sim=0.43; seed-math-04 d=0.72 sim=0.41; seed-extract-04 d=0.30 sim=0.41; seed-reason-01 d=0.82 sim=0.40] → difficulty 0.43 (easy, conf 0.54, threshold 0.45)",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.932,
+     "cost_usd": 0.00444,
+     "reason": "knn: 5 neighbors [seed-math-01 d=0.35 sim=0.54; seed-qa-02 d=0.12 sim=0.54; seed-math-03 d=0.75 sim=0.48; seed-math-02 d=0.62 sim=0.47; seed-math-04 d=0.72 sim=0.47] → difficulty 0.50 (hard, conf 0.60, threshold 0.45)",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.887,
+     "cost_usd": 0.0001105,
+     "reason": "knn: 5 neighbors [seed-qa-03 d=0.14 sim=0.51; seed-chat-05 d=0.15 sim=0.47; seed-sum-01 d=0.38 sim=0.42; seed-math-03 d=0.75 sim=0.41; seed-extract-02 d=0.22 sim=0.41] → difficulty 0.32 (easy, conf 0.77, threshold 0.45)",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.94,
+     "cost_usd": 0.00005,
+     "reason": "knn: 5 neighbors [seed-extract-02 d=0.22 sim=0.52; seed-qa-03 d=0.14 sim=0.43; seed-extract-04 d=0.30 sim=0.43; seed-extract-03 d=0.28 sim=0.42; seed-reason-01 d=0.82 sim=0.41] → difficulty 0.34 (easy, conf 0.72, threshold 0.45)",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.878,
+     "cost_usd": 0.00017425,
+     "reason": "knn: 5 neighbors [seed-reason-01 d=0.82 sim=0.46; seed-qa-05 d=0.20 sim=0.43; seed-easy-long-02 d=0.10 sim=0.43; seed-chat-03 d=0.18 sim=0.43; seed-sum-01 d=0.38 sim=0.41] → difficulty 0.34 (easy, conf 0.72, threshold 0.45)",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.956,
+     "cost_usd": 0.00296,
+     "reason": "knn: 5 neighbors [seed-qa-04 d=0.24 sim=0.55; seed-reason-01 d=0.82 sim=0.48; seed-code-03 d=0.68 sim=0.47; seed-sum-03 d=0.45 sim=0.47; seed-extract-03 d=0.28 sim=0.45] → difficulty 0.49 (hard, conf 0.58, threshold 0.45)",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.949,
+     "cost_usd": 0.00013175,
+     "reason": "knn: 5 neighbors [seed-extract-02 d=0.22 sim=0.46; seed-qa-05 d=0.20 sim=0.46; seed-chat-05 d=0.15 sim=0.45; seed-reason-01 d=0.82 sim=0.44; seed-chat-01 d=0.08 sim=0.42] → difficulty 0.29 (easy, conf 0.81, threshold 0.45)",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.89,
+     "cost_usd": 0.00016425,
+     "reason": "knn: 5 neighbors [seed-extract-02 d=0.22 sim=0.55; seed-math-01 d=0.35 sim=0.48; seed-reason-01 d=0.82 sim=0.47; seed-qa-01 d=0.15 sim=0.45; seed-qa-05 d=0.20 sim=0.45] → difficulty 0.35 (easy, conf 0.70, threshold 0.45)",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.823,
+     "cost_usd": 0.00010125,
+     "reason": "knn: 5 neighbors [seed-extract-01 d=0.25 sim=0.58; seed-extract-04 d=0.30 sim=0.57; seed-code-01 d=0.50 sim=0.47; seed-code-04 d=0.60 sim=0.46; seed-code-03 d=0.68 sim=0.45] → difficulty 0.45 (easy, conf 0.50, threshold 0.45)",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.888,
+     "cost_usd": 0.00015025,
+     "reason": "knn: 5 neighbors [seed-extract-04 d=0.30 sim=0.78; seed-extract-01 d=0.25 sim=0.63; seed-sum-02 d=0.42 sim=0.55; seed-extract-02 d=0.22 sim=0.50; seed-code-01 d=0.50 sim=0.49] → difficulty 0.33 (easy, conf 0.74, threshold 0.45)",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.842,
+     "cost_usd": 0.00016975,
+     "reason": "knn: 5 neighbors [seed-easy-long-02 d=0.10 sim=0.57; seed-sum-01 d=0.38 sim=0.57; seed-extract-02 d=0.22 sim=0.54; seed-sum-03 d=0.45 sim=0.53; seed-extract-03 d=0.28 sim=0.52] → difficulty 0.28 (easy, conf 0.83, threshold 0.45)",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.875,
+     "cost_usd": 0.00024025,
+     "reason": "knn: 5 neighbors [seed-extract-03 d=0.28 sim=0.63; seed-extract-04 d=0.30 sim=0.60; seed-extract-01 d=0.25 sim=0.57; seed-code-05 d=0.55 sim=0.52; seed-code-03 d=0.68 sim=0.50] → difficulty 0.40 (easy, conf 0.60, threshold 0.45)",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.873,
+     "cost_usd": 0.0001685,
+     "reason": "knn: 5 neighbors [seed-extract-04 d=0.30 sim=0.60; seed-extract-02 d=0.22 sim=0.55; seed-sum-02 d=0.42 sim=0.54; seed-extract-03 d=0.28 sim=0.52; seed-easy-long-02 d=0.10 sim=0.50] → difficulty 0.27 (easy, conf 0.87, threshold 0.45)",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.839,
+     "cost_usd": 0.0002285,
+     "reason": "knn: 5 neighbors [seed-extract-01 d=0.25 sim=0.58; seed-sum-03 d=0.45 sim=0.58; seed-extract-04 d=0.30 sim=0.54; seed-easy-long-02 d=0.10 sim=0.53; seed-extract-03 d=0.28 sim=0.53] → difficulty 0.28 (easy, conf 0.84, threshold 0.45)",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.775,
+     "cost_usd": 0.000192,
+     "reason": "knn: 5 neighbors [seed-sum-01 d=0.38 sim=0.60; seed-sum-02 d=0.42 sim=0.54; seed-extract-02 d=0.22 sim=0.51; seed-sum-03 d=0.45 sim=0.51; seed-reason-04 d=0.66 sim=0.49] → difficulty 0.42 (easy, conf 0.55, threshold 0.45)",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.922,
+     "cost_usd": 0.00514,
+     "reason": "knn: 5 neighbors [seed-sum-02 d=0.42 sim=0.64; seed-sum-03 d=0.45 sim=0.61; seed-extract-03 d=0.28 sim=0.60; seed-sum-01 d=0.38 sim=0.54; seed-reason-01 d=0.82 sim=0.53] → difficulty 0.46 (hard, conf 0.53, threshold 0.45)",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.794,
+     "cost_usd": 0.00022525,
+     "reason": "knn: 5 neighbors [seed-sum-03 d=0.45 sim=0.66; seed-sum-02 d=0.42 sim=0.59; seed-easy-long-02 d=0.10 sim=0.57; seed-reason-04 d=0.66 sim=0.57; seed-sum-01 d=0.38 sim=0.56] → difficulty 0.40 (easy, conf 0.59, threshold 0.45)",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.927,
+     "cost_usd": 0.00916,
+     "reason": "knn: 5 neighbors [seed-reason-02 d=0.85 sim=0.53; seed-sum-03 d=0.45 sim=0.53; seed-code-03 d=0.68 sim=0.51; seed-hard-short-02 d=0.80 sim=0.51; seed-sum-01 d=0.38 sim=0.50] → difficulty 0.63 (hard, conf 0.87, threshold 0.45)",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.906,
+     "cost_usd": 0.00814,
+     "reason": "knn: 5 neighbors [seed-code-02 d=0.58 sim=0.57; seed-math-03 d=0.75 sim=0.48; seed-math-05 d=0.78 sim=0.48; seed-sum-03 d=0.45 sim=0.48; seed-code-01 d=0.50 sim=0.48] → difficulty 0.61 (hard, conf 0.82, threshold 0.45)",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.92,
+     "cost_usd": 0.01773,
+     "reason": "knn: 5 neighbors [seed-code-01 d=0.50 sim=0.58; seed-code-03 d=0.68 sim=0.52; seed-code-05 d=0.55 sim=0.52; seed-code-04 d=0.60 sim=0.51; seed-sum-02 d=0.42 sim=0.49] → difficulty 0.55 (hard, conf 0.70, threshold 0.45)",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01716,
+     "reason": "knn: 5 neighbors [seed-code-01 d=0.50 sim=0.49; seed-code-05 d=0.55 sim=0.49; seed-extract-02 d=0.22 sim=0.47; seed-hard-short-01 d=0.74 sim=0.47; seed-sum-03 d=0.45 sim=0.46] → difficulty 0.49 (hard, conf 0.58, threshold 0.45)",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.908,
+     "cost_usd": 0.02469,
+     "reason": "knn: 5 neighbors [seed-code-04 d=0.60 sim=0.66; seed-extract-04 d=0.30 sim=0.53; seed-code-01 d=0.50 sim=0.52; seed-reason-02 d=0.85 sim=0.52; seed-code-05 d=0.55 sim=0.50] → difficulty 0.56 (hard, conf 0.72, threshold 0.45)",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.689,
+     "cost_usd": 0.00032575,
+     "reason": "knn: 5 neighbors [seed-easy-long-02 d=0.10 sim=0.47; seed-reason-05 d=0.88 sim=0.46; seed-code-02 d=0.58 sim=0.45; seed-chat-05 d=0.15 sim=0.44; seed-extract-03 d=0.28 sim=0.44] → difficulty 0.40 (easy, conf 0.60, threshold 0.45)",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01999,
+     "reason": "knn: 5 neighbors [seed-reason-05 d=0.88 sim=0.56; seed-code-02 d=0.58 sim=0.54; seed-code-03 d=0.68 sim=0.53; seed-reason-01 d=0.82 sim=0.51; seed-sum-03 d=0.45 sim=0.51] → difficulty 0.69 (hard, conf 0.97, threshold 0.45)",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.01647,
+     "reason": "knn: 5 neighbors [seed-code-03 d=0.68 sim=0.54; seed-code-01 d=0.50 sim=0.49; seed-code-05 d=0.55 sim=0.49; seed-reason-05 d=0.88 sim=0.48; seed-hard-short-01 d=0.74 sim=0.48] → difficulty 0.67 (hard, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.011,
+     "reason": "knn: 5 neighbors [seed-code-01 d=0.50 sim=0.59; seed-code-03 d=0.68 sim=0.53; seed-reason-05 d=0.88 sim=0.52; seed-sum-03 d=0.45 sim=0.51; seed-hard-short-02 d=0.80 sim=0.50] → difficulty 0.66 (hard, conf 0.92, threshold 0.45)",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.01726,
+     "reason": "knn: 5 neighbors [seed-code-04 d=0.60 sim=0.58; seed-code-03 d=0.68 sim=0.48; seed-code-05 d=0.55 sim=0.46; seed-sum-02 d=0.42 sim=0.45; seed-code-01 d=0.50 sim=0.45] → difficulty 0.55 (hard, conf 0.71, threshold 0.45)",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01737,
+     "reason": "knn: 5 neighbors [seed-math-03 d=0.75 sim=0.54; seed-reason-01 d=0.82 sim=0.54; seed-math-01 d=0.35 sim=0.51; seed-reason-05 d=0.88 sim=0.50; seed-qa-05 d=0.20 sim=0.49] → difficulty 0.61 (hard, conf 0.81, threshold 0.45)",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.913,
+     "cost_usd": 0.00818,
+     "reason": "knn: 5 neighbors [seed-reason-03 d=0.70 sim=0.51; seed-reason-01 d=0.82 sim=0.49; seed-extract-02 d=0.22 sim=0.49; seed-sum-03 d=0.45 sim=0.47; seed-math-03 d=0.75 sim=0.45] → difficulty 0.59 (hard, conf 0.78, threshold 0.45)",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.893,
+     "cost_usd": 0.00835,
+     "reason": "knn: 5 neighbors [seed-math-02 d=0.62 sim=0.76; seed-math-03 d=0.75 sim=0.55; seed-math-04 d=0.72 sim=0.49; seed-hard-short-03 d=0.70 sim=0.48; seed-math-05 d=0.78 sim=0.48] → difficulty 0.71 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.902,
+     "cost_usd": 0.01885,
+     "reason": "knn: 5 neighbors [seed-math-05 d=0.78 sim=0.63; seed-math-03 d=0.75 sim=0.61; seed-math-04 d=0.72 sim=0.52; seed-math-01 d=0.35 sim=0.50; seed-hard-short-03 d=0.70 sim=0.46] → difficulty 0.67 (hard, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.494,
+     "cost_usd": 0.0007415,
+     "reason": "knn: 5 neighbors [seed-sum-01 d=0.38 sim=0.51; seed-easy-long-02 d=0.10 sim=0.50; seed-chat-05 d=0.15 sim=0.47; seed-extract-04 d=0.30 sim=0.47; seed-math-05 d=0.78 sim=0.46] → difficulty 0.34 (easy, conf 0.72, threshold 0.45)",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.861,
+     "cost_usd": 0.01922,
+     "reason": "knn: 5 neighbors [seed-reason-04 d=0.66 sim=0.55; seed-sum-03 d=0.45 sim=0.54; seed-reason-05 d=0.88 sim=0.53; seed-reason-02 d=0.85 sim=0.53; seed-reason-01 d=0.82 sim=0.52] → difficulty 0.73 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.02791,
+     "reason": "knn: 5 neighbors [seed-math-05 d=0.78 sim=0.61; seed-math-03 d=0.75 sim=0.61; seed-math-01 d=0.35 sim=0.57; seed-math-04 d=0.72 sim=0.57; seed-reason-03 d=0.70 sim=0.53] → difficulty 0.66 (hard, conf 0.92, threshold 0.45)",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.02888,
+     "reason": "knn: 5 neighbors [seed-sum-03 d=0.45 sim=0.59; seed-easy-long-02 d=0.10 sim=0.58; seed-reason-01 d=0.82 sim=0.56; seed-sum-02 d=0.42 sim=0.55; seed-reason-02 d=0.85 sim=0.54] → difficulty 0.52 (hard, conf 0.65, threshold 0.45)",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.02296,
+     "reason": "knn: 5 neighbors [seed-hard-short-03 d=0.70 sim=0.58; seed-math-04 d=0.72 sim=0.54; seed-reason-05 d=0.88 sim=0.44; seed-hard-short-01 d=0.74 sim=0.43; seed-math-02 d=0.62 sim=0.43] → difficulty 0.73 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01594,
+     "reason": "knn: 5 neighbors [seed-math-04 d=0.72 sim=0.50; seed-hard-short-01 d=0.74 sim=0.50; seed-math-03 d=0.75 sim=0.47; seed-hard-short-02 d=0.80 sim=0.45; seed-qa-02 d=0.12 sim=0.44] → difficulty 0.63 (hard, conf 0.87, threshold 0.45)",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.011,
+     "reason": "knn: 5 neighbors [seed-math-04 d=0.72 sim=0.56; seed-hard-short-01 d=0.74 sim=0.52; seed-hard-short-02 d=0.80 sim=0.51; seed-math-03 d=0.75 sim=0.50; seed-reason-05 d=0.88 sim=0.49] → difficulty 0.78 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.02335,
+     "reason": "knn: 5 neighbors [seed-reason-05 d=0.88 sim=0.58; seed-hard-short-01 d=0.74 sim=0.53; seed-hard-short-03 d=0.70 sim=0.53; seed-reason-01 d=0.82 sim=0.52; seed-hard-short-02 d=0.80 sim=0.52] → difficulty 0.79 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.000086,
+     "reason": "knn: 5 neighbors [seed-easy-long-02 d=0.10 sim=0.64; seed-extract-01 d=0.25 sim=0.58; seed-chat-05 d=0.15 sim=0.57; seed-easy-long-01 d=0.10 sim=0.51; seed-chat-01 d=0.08 sim=0.48] → difficulty 0.14 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.922,
+     "cost_usd": 0.000079,
+     "reason": "knn: 5 neighbors [seed-easy-long-02 d=0.10 sim=0.65; seed-reason-01 d=0.82 sim=0.55; seed-chat-03 d=0.18 sim=0.55; seed-chat-02 d=0.06 sim=0.53; seed-extract-02 d=0.22 sim=0.49] → difficulty 0.27 (easy, conf 0.85, threshold 0.45)",
+     "label_difficulty": 0.115
+    }
+   ]
+  },
+  {
+   "policy": "smart-tier1",
+   "cost_usd": 0.401484,
+   "mean_quality": 0.9000408163265307,
+   "routed_by_band": {
+    "cheap": 24,
+    "frontier": 25
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.00005225,
+     "reason": "lexical: words=4 easy=2(hey,how's it going) short-question → difficulty 0.02 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.913,
+     "cost_usd": 0.00005825,
+     "reason": "lexical: words=8 easy=1(good morning) short-question → difficulty 0.13 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.924,
+     "cost_usd": 0.000035,
+     "reason": "lexical: words=10 easy=1(thanks) → difficulty 0.21 (easy, conf 0.98, threshold 0.45)",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.929,
+     "cost_usd": 0.0000515,
+     "reason": "lexical: words=6 easy=2(lol,what's up) → difficulty 0.10 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.95,
+     "cost_usd": 0.00011625,
+     "reason": "lexical: words=12 easy=1(friendlier) numbers=1 → difficulty 0.23 (easy, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.932,
+     "cost_usd": 0.00005775,
+     "reason": "lexical: words=6 easy=1(wish me luck) → difficulty 0.20 (easy, conf 0.99, threshold 0.45)",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.921,
+     "cost_usd": 0.00004475,
+     "reason": "lexical: words=8 easy=1(icebreaker) short-question → difficulty 0.13 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.934,
+     "cost_usd": 0.00007675,
+     "reason": "lexical: words=10 short-question → difficulty 0.23 (easy, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.928,
+     "cost_usd": 0.000146,
+     "reason": "lexical: words=6 short-question → difficulty 0.23 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.892,
+     "cost_usd": 0.00013275,
+     "reason": "lexical: words=8 short-question → difficulty 0.23 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.887,
+     "cost_usd": 0.0001105,
+     "reason": "lexical: words=7 short-question → difficulty 0.23 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.94,
+     "cost_usd": 0.00005,
+     "reason": "lexical: words=7 short-question → difficulty 0.23 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.878,
+     "cost_usd": 0.00017425,
+     "reason": "lexical: words=10 short-question → difficulty 0.23 (easy, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.916,
+     "cost_usd": 0.0000885,
+     "reason": "lexical: words=5 numbers=1 short-question → difficulty 0.24 (easy, conf 0.91, threshold 0.45)",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.949,
+     "cost_usd": 0.00013175,
+     "reason": "lexical: words=9 short-question → difficulty 0.23 (easy, conf 0.95, threshold 0.45)",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.89,
+     "cost_usd": 0.00016425,
+     "reason": "lexical: words=11 short-question → difficulty 0.23 (easy, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.823,
+     "cost_usd": 0.00010125,
+     "reason": "lexical: words=22 code=2(from,return) extract=2(extract,json array) → difficulty 0.32 (easy, conf 0.76, threshold 0.45)",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.888,
+     "cost_usd": 0.00015025,
+     "reason": "lexical: words=16 code=1(return) extract=1(return json) numbers=3 → difficulty 0.37 (easy, conf 0.65, threshold 0.45)",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.842,
+     "cost_usd": 0.00016975,
+     "reason": "lexical: words=20 extract=3(comma-separated,list the,ticker) → difficulty 0.11 (easy, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.875,
+     "cost_usd": 0.00024025,
+     "reason": "lexical: words=21 code=1(from) extract=2(as json,extract) numbers=6 → difficulty 0.37 (easy, conf 0.67, threshold 0.45)",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.873,
+     "cost_usd": 0.0001685,
+     "reason": "lexical: words=25 extract=2(iso format,pull out) numbers=4 → difficulty 0.26 (easy, conf 0.88, threshold 0.45)",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.839,
+     "cost_usd": 0.0002285,
+     "reason": "lexical: words=28 code=1(from) extract=1(extract) → difficulty 0.32 (easy, conf 0.76, threshold 0.45)",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.895,
+     "cost_usd": 0.00657,
+     "reason": "lexical: words=57 math=1(percent) summary=2(in two sentences,summarize) numbers=2 → difficulty 0.49 (hard, conf 0.57, threshold 0.45)",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.922,
+     "cost_usd": 0.00514,
+     "reason": "lexical: words=45 code=1(query) summary=1(summary) numbers=3 → difficulty 0.47 (hard, conf 0.53, threshold 0.45)",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.908,
+     "cost_usd": 0.00769,
+     "reason": "lexical: words=70 math=1(prove) reason=1(prove) summary=2(condense,three bullets) numbers=1 → difficulty 0.60 (hard, conf 0.79, threshold 0.45)",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.927,
+     "cost_usd": 0.00916,
+     "reason": "lexical: words=57 math=1(percent) summary=1(tl;dr) numbers=1 → difficulty 0.47 (hard, conf 0.53, threshold 0.45)",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.906,
+     "cost_usd": 0.00814,
+     "reason": "lexical: words=22 code=2(function,python) → difficulty 0.46 (hard, conf 0.52, threshold 0.45)",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.92,
+     "cost_usd": 0.01773,
+     "reason": "lexical: words=28 code=2(function,go) → difficulty 0.46 (hard, conf 0.52, threshold 0.45)",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01716,
+     "reason": "lexical: words=15 code=4(function,return,script) → difficulty 0.59 (hard, conf 0.78, threshold 0.45)",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.908,
+     "cost_usd": 0.02469,
+     "reason": "lexical: words=28 code=3(function,query,sql) numbers=1 → difficulty 0.55 (hard, conf 0.70, threshold 0.45)",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.916,
+     "cost_usd": 0.01092,
+     "reason": "lexical: words=27 code=2(bash,script) numbers=1 → difficulty 0.48 (hard, conf 0.56, threshold 0.45)",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01999,
+     "reason": "lexical: words=24 code=1(python) fences=1 reason=1(explain why) → difficulty 0.69 (hard, conf 0.98, threshold 0.45)",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.01647,
+     "reason": "lexical: words=16 code=2(deadlock,go) fences=1 reason=1(why does) numbers=1 → difficulty 0.77 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.011,
+     "reason": "lexical: words=26 code=2(const,function) fences=1 numbers=3 → difficulty 0.70 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.01726,
+     "reason": "lexical: words=33 code=4(from,select,sql) → difficulty 0.61 (hard, conf 0.81, threshold 0.45)",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01737,
+     "reason": "lexical: words=36 math=3(how long until,l/min,show your work) numbers=4 → difficulty 0.71 (hard, conf 1.00, threshold 0.45)",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.913,
+     "cost_usd": 0.00818,
+     "reason": "lexical: words=35 math=2(how far,km/h) easy=1(hey) numbers=4 → difficulty 0.51 (hard, conf 0.62, threshold 0.45)",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.893,
+     "cost_usd": 0.00835,
+     "reason": "lexical: words=22 math=2(compound,show the calculation) numbers=3 → difficulty 0.58 (hard, conf 0.76, threshold 0.45)",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.902,
+     "cost_usd": 0.01885,
+     "reason": "lexical: words=26 math=3(fraction,probability,without replacement) numbers=3 → difficulty 0.68 (hard, conf 0.96, threshold 0.45)",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.858,
+     "cost_usd": 0.02484,
+     "reason": "lexical: words=50 reason=1(walk through) → difficulty 0.46 (hard, conf 0.52, threshold 0.45)",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.861,
+     "cost_usd": 0.01922,
+     "reason": "lexical: words=36 reason=2(compare,design a) numbers=1 → difficulty 0.59 (hard, conf 0.78, threshold 0.45)",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.02791,
+     "reason": "lexical: words=29 reason=1(generalize) numbers=1 → difficulty 0.46 (hard, conf 0.53, threshold 0.45)",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.02888,
+     "reason": "lexical: words=35 code=1(debug) reason=2(debugging plan,systematic) numbers=1 → difficulty 0.66 (hard, conf 0.92, threshold 0.45)",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.02296,
+     "reason": "lexical: words=9 math=2(irrational,prove) reason=1(prove) numbers=1 → difficulty 0.65 (hard, conf 0.89, threshold 0.45)",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01594,
+     "reason": "lexical: words=6 math=2(prime,prove) reason=1(prove) → difficulty 0.62 (hard, conf 0.85, threshold 0.45)",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.011,
+     "reason": "lexical: words=6 reason=1(rigorous) numbers=2 → difficulty 0.47 (hard, conf 0.53, threshold 0.45)",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.02335,
+     "reason": "lexical: words=12 reason=3(diagonaliz,halting problem,why does) → difficulty 0.67 (hard, conf 0.94, threshold 0.45)",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.937,
+     "cost_usd": 0.000086,
+     "reason": "lexical: words=95 easy=1(just reply) numbers=6 → difficulty 0.40 (easy, conf 0.61, threshold 0.45)",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "gemini",
+     "model": "gemini-3.1-flash-lite",
+     "band": "cheap",
+     "quality": 0.922,
+     "cost_usd": 0.000079,
+     "reason": "lexical: words=79 easy=2(no advice,venting) numbers=2 → difficulty 0.20 (easy, conf 0.99, threshold 0.45)",
+     "label_difficulty": 0.115
+    }
+   ]
+  },
+  {
+   "policy": "static-frontier",
+   "cost_usd": 0.49024999999999996,
+   "mean_quality": 0.9175306122448982,
+   "routed_by_band": {
+    "frontier": 49
+   },
+   "errors": 0,
+   "decisions": [
+    {
+     "row_id": "chitchat-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.943,
+     "cost_usd": 0.00175,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.141
+    },
+    {
+     "row_id": "chitchat-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.937,
+     "cost_usd": 0.00196,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.153
+    },
+    {
+     "row_id": "chitchat-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.94,
+     "cost_usd": 0.00119,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.127
+    },
+    {
+     "row_id": "chitchat-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.937,
+     "cost_usd": 0.00173,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.12
+    },
+    {
+     "row_id": "chitchat-05",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.944,
+     "cost_usd": 0.0039,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.08
+    },
+    {
+     "row_id": "chitchat-06",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.958,
+     "cost_usd": 0.00194,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.095
+    },
+    {
+     "row_id": "chitchat-07",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.966,
+     "cost_usd": 0.00151,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.129
+    },
+    {
+     "row_id": "chitchat-08",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.946,
+     "cost_usd": 0.00258,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.062
+    },
+    {
+     "row_id": "simple-qa-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.941,
+     "cost_usd": 0.00488,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.155
+    },
+    {
+     "row_id": "simple-qa-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.932,
+     "cost_usd": 0.00444,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.226
+    },
+    {
+     "row_id": "simple-qa-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.949,
+     "cost_usd": 0.0037,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "simple-qa-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.939,
+     "cost_usd": 0.00168,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.135
+    },
+    {
+     "row_id": "simple-qa-05",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.917,
+     "cost_usd": 0.00583,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.307
+    },
+    {
+     "row_id": "simple-qa-06",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.956,
+     "cost_usd": 0.00296,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.206
+    },
+    {
+     "row_id": "simple-qa-07",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.94,
+     "cost_usd": 0.00441,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.138
+    },
+    {
+     "row_id": "simple-qa-08",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.936,
+     "cost_usd": 0.0055,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.258
+    },
+    {
+     "row_id": "extraction-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.939,
+     "cost_usd": 0.00344,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.366
+    },
+    {
+     "row_id": "extraction-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.94,
+     "cost_usd": 0.00506,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.271
+    },
+    {
+     "row_id": "extraction-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.914,
+     "cost_usd": 0.00571,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.337
+    },
+    {
+     "row_id": "extraction-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.931,
+     "cost_usd": 0.00806,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.253
+    },
+    {
+     "row_id": "extraction-05",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.94,
+     "cost_usd": 0.00567,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.296
+    },
+    {
+     "row_id": "extraction-06",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.922,
+     "cost_usd": 0.00768,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.383
+    },
+    {
+     "row_id": "summarize-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.895,
+     "cost_usd": 0.00657,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.451
+    },
+    {
+     "row_id": "summarize-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.922,
+     "cost_usd": 0.00514,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "summarize-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.908,
+     "cost_usd": 0.00769,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.415
+    },
+    {
+     "row_id": "summarize-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.927,
+     "cost_usd": 0.00916,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.46
+    },
+    {
+     "row_id": "code-write-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.906,
+     "cost_usd": 0.00814,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.637
+    },
+    {
+     "row_id": "code-write-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.92,
+     "cost_usd": 0.01773,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.529
+    },
+    {
+     "row_id": "code-write-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01716,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.513
+    },
+    {
+     "row_id": "code-write-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.908,
+     "cost_usd": 0.02469,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.556
+    },
+    {
+     "row_id": "code-write-05",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.916,
+     "cost_usd": 0.01092,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.561
+    },
+    {
+     "row_id": "code-debug-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.89,
+     "cost_usd": 0.01999,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.577
+    },
+    {
+     "row_id": "code-debug-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.01647,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.735
+    },
+    {
+     "row_id": "code-debug-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.011,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.588
+    },
+    {
+     "row_id": "code-debug-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.01726,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.631
+    },
+    {
+     "row_id": "math-word-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01737,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.783
+    },
+    {
+     "row_id": "math-word-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.913,
+     "cost_usd": 0.00818,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.604
+    },
+    {
+     "row_id": "math-word-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.893,
+     "cost_usd": 0.00835,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.697
+    },
+    {
+     "row_id": "math-word-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.902,
+     "cost_usd": 0.01885,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.713
+    },
+    {
+     "row_id": "multi-step-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.858,
+     "cost_usd": 0.02484,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.869
+    },
+    {
+     "row_id": "multi-step-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.861,
+     "cost_usd": 0.01922,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.891
+    },
+    {
+     "row_id": "multi-step-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.02791,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.909
+    },
+    {
+     "row_id": "multi-step-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.02888,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.705
+    },
+    {
+     "row_id": "short-hard-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.904,
+     "cost_usd": 0.02296,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.739
+    },
+    {
+     "row_id": "short-hard-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.887,
+     "cost_usd": 0.01594,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.793
+    },
+    {
+     "row_id": "short-hard-03",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.889,
+     "cost_usd": 0.011,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.819
+    },
+    {
+     "row_id": "short-hard-04",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.87,
+     "cost_usd": 0.02335,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.728
+    },
+    {
+     "row_id": "long-easy-01",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.955,
+     "cost_usd": 0.00309,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.181
+    },
+    {
+     "row_id": "long-easy-02",
+     "provider": "anthropic",
+     "model": "claude-fable-5",
+     "band": "frontier",
+     "quality": 0.954,
+     "cost_usd": 0.00281,
+     "reason": "static: always anthropic/claude-fable-5",
+     "label_difficulty": 0.115
+    }
+   ]
+  }
+ ],
+ "verdict": {
+  "baseline": "static-frontier",
+  "quality_tolerance": 0.02,
+  "passing": [
+   "smart-tier1"
+  ],
+  "tier1_passes_gate": true,
+  "rule": "pass = mean_quality \u003e= static-frontier mean_quality - 0.020 AND cost_usd \u003c static-frontier cost_usd"
+ }
+}

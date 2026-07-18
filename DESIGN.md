@@ -5,12 +5,12 @@
 > outbound (BYOK), with pluggable routing policies from `static` to learned `smart`
 > routing. Zero telemetry. Apache-2.0.
 
-Status: **Phases 1–3 complete (phase 3 closed 2026-07-18: corpus audit, §0.7
-resolution, alias routers, reliability suite, pricing+cost with explicit
-unpriced state, observability, `/v1/embeddings`, exact-match cache, §11
-benchmark gate — measured ~0.18 ms p50 non-streaming overhead / ~0.63 ms added
-TTFT against 5 ms / 2 ms budgets, containerized `-race` green). Next: Phase 4
-smart routing.** This document is kept current as the code evolves.
+Status: **Phases 1–4 complete (phase 4 closed 2026-07-18: `relay eval` harness +
+committed eval set v1, tier-1 lexical + tier-2 KNN smart routing, `relay train`
+with all three §0.4 label sources, `/v1/feedback`, §0.3 launch gate run — tier 1
+passed at −18% cost within 0.017 quality of static-frontier and ships enabled;
+tier 2 is the post-`relay train` upgrade path; containerized `-race` green).
+Next: Phase 5 OSS polish.** This document is kept current as the code evolves.
 
 **Standing convention:** any decision where the implementation disagrees with the spec
 or the reviewer — or wants to — gets argued *in writing* in §0 before code is written.
@@ -79,6 +79,18 @@ day. If it fails the bar, it ships **off by default** and Ollama-embedding-KNN b
 the documented smart tier (with the lexical tier available behind an explicit config
 flag, clearly labeled experimental). The Phase 4 eval report must state which side of
 this gate we landed on; Phase 5 README copy depends on it.
+
+**GATE OUTCOME (2026-07-18, eval set v1, tolerance 0.02):** `relay eval` compared
+static-frontier / static-mid / static-cheap / cheapest / tier-1 / tier-2 on the
+committed set. **Tier 1 passed** — mean quality 0.900 vs baseline 0.918 (−0.017,
+within tolerance) at −18% cost — and ships as the enabled default `smart` tier.
+Tier 2 with only the 37-text seed reference set missed the tolerance (−0.033 at
+−27% cost; two hard rows matched weak ≈0.5-similarity neighbors), which is the
+expected cold-start result: tier 2 is the *documented upgrade path once `relay
+train` densifies the reference set from real traffic*, not the cold-start
+default. Caveats: quality labels are synthetic and tier-1 weights were
+calibrated in-sample (assets/eval/README.md states both plainly); the verdict is
+"on this set under this quality model", re-run per release.
 
 ### 0.4 "Train from your own traffic" has a labeling problem — be honest about the loop
 
@@ -658,3 +670,11 @@ No billing/accounts/multi-tenancy (single admin key), no hosted service, no sema
 cache impl, no mid-stream model switching, no `/v1/responses` (roadmap), no ONNX-in-
 process (roadmap behind build tag), no web UI beyond the one dashboard page, **no
 telemetry of any kind — ever, not even opt-in version pings in v1.**
+
+Also out for v1, on the routing-research roadmap with credit to the prior art:
+RL/bandit routers, and learned matrix-factorization / graph routers as in
+RouteLLM (Ong et al., "RouteLLM: Learning to Route LLMs with Preference Data",
+arXiv:2406.18665) and GraphRouter (Feng, Shen & You, "GraphRouter: A Graph-based
+Router for LLM Selections", ICLR 2025, arXiv:2410.03834). Relay's tier-2 KNN is
+the same family as RouteLLM's similarity-weighted router, run locally over your
+own traffic.
