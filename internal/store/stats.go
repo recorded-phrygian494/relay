@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -17,6 +18,7 @@ type ModelStats struct {
 	TokensIn  int64
 	TokensOut int64
 	CostUSD   float64
+	Unpriced  int64 // requests with no pricing entry — CostUSD is incomplete
 	P50MS     int64
 	P95MS     int64
 }
@@ -28,7 +30,8 @@ func Stats(db *sql.DB, since time.Time) ([]ModelStats, error) {
 		       COUNT(*),
 		       SUM(CASE WHEN status >= 400 OR status = 0 THEN 1 ELSE 0 END),
 		       COALESCE(SUM(tokens_in),0), COALESCE(SUM(tokens_out),0),
-		       COALESCE(SUM(cost_usd),0)
+		       COALESCE(SUM(cost_usd),0),
+		       SUM(cost_usd IS NULL AND COALESCE(provider,'') != '')
 		FROM requests WHERE ts >= ?
 		GROUP BY 1, 2 ORDER BY 3 DESC`, since.UnixMilli())
 	if err != nil {
@@ -40,7 +43,7 @@ func Stats(db *sql.DB, since time.Time) ([]ModelStats, error) {
 	for rows.Next() {
 		var m ModelStats
 		if err := rows.Scan(&m.Provider, &m.Model, &m.Requests, &m.Errors,
-			&m.TokensIn, &m.TokensOut, &m.CostUSD); err != nil {
+			&m.TokensIn, &m.TokensOut, &m.CostUSD, &m.Unpriced); err != nil {
 			return nil, err
 		}
 		out = append(out, m)
@@ -103,9 +106,19 @@ func FormatTable(stats []ModelStats) string {
 	}
 	out := fmt.Sprintf("%-14s %-34s %8s %6s %12s %12s %10s %8s %8s\n",
 		"PROVIDER", "MODEL", "REQS", "ERRS", "TOKENS_IN", "TOKENS_OUT", "COST_USD", "P50_MS", "P95_MS")
+	var unpriced []string
 	for _, m := range stats {
-		out += fmt.Sprintf("%-14s %-34s %8d %6d %12d %12d %10.4f %8d %8d\n",
-			m.Provider, m.Model, m.Requests, m.Errors, m.TokensIn, m.TokensOut, m.CostUSD, m.P50MS, m.P95MS)
+		cost := fmt.Sprintf("%10.4f", m.CostUSD)
+		if m.Unpriced > 0 {
+			cost = fmt.Sprintf("%10s", "—")
+			unpriced = append(unpriced, fmt.Sprintf("%s/%s (%d reqs)", m.Provider, m.Model, m.Unpriced))
+		}
+		out += fmt.Sprintf("%-14s %-34s %8d %6d %12d %12d %s %8d %8d\n",
+			m.Provider, m.Model, m.Requests, m.Errors, m.TokensIn, m.TokensOut, cost, m.P50MS, m.P95MS)
+	}
+	if len(unpriced) > 0 {
+		out += "\nunpriced (no pricing.json entry — cost totals are incomplete): " +
+			strings.Join(unpriced, ", ") + "\n"
 	}
 	return out
 }

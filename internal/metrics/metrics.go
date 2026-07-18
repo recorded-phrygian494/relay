@@ -22,6 +22,7 @@ type Metrics struct {
 	TokensIn  *prometheus.CounterVec
 	TokensOut *prometheus.CounterVec
 	CostUSD   *prometheus.CounterVec
+	Unpriced  *prometheus.CounterVec
 	Breakers    *prometheus.GaugeVec
 	KeysCooling *prometheus.GaugeVec
 	LogDrops    prometheus.CounterFunc
@@ -63,12 +64,16 @@ func New(droppedFn func() float64) *Metrics {
 			Name: "relay_circuit_open",
 			Help: "1 when the circuit breaker for provider/model is open.",
 		}, []string{"provider", "model"}),
+		Unpriced: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: "relay_unpriced_requests_total",
+			Help: "Served requests whose model has no pricing entry — cost totals are incomplete.",
+		}, []string{"provider", "model"}),
 		KeysCooling: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "relay_keys_cooling",
 			Help: "API keys currently in rate-limit cooldown per provider.",
 		}, []string{"provider"}),
 	}
-	reg.MustRegister(m.Requests, m.Latency, m.TTFT, m.TokensIn, m.TokensOut, m.CostUSD, m.Breakers, m.KeysCooling)
+	reg.MustRegister(m.Requests, m.Latency, m.TTFT, m.TokensIn, m.TokensOut, m.CostUSD, m.Unpriced, m.Breakers, m.KeysCooling)
 	reg.MustRegister(collectors.NewGoCollector())
 	if droppedFn != nil {
 		m.LogDrops = prometheus.NewCounterFunc(prometheus.CounterOpts{

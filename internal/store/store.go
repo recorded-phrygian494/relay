@@ -63,7 +63,7 @@ type Record struct {
 	ErrorCode      string
 	TokensIn       int
 	TokensOut      int
-	CostUSD        float64
+	CostUSD        *float64 // nil = model not in the pricing registry (logged as NULL)
 	LatencyMS      int64
 	TTFTMS         int64
 	Stream         bool

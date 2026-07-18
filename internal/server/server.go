@@ -55,8 +55,12 @@ func (s *Server) observe(rec *store.Record) {
 	if rec.TokensOut > 0 {
 		s.metrics.TokensOut.WithLabelValues(provider, model).Add(float64(rec.TokensOut))
 	}
-	if rec.CostUSD > 0 {
-		s.metrics.CostUSD.WithLabelValues(provider, model).Add(rec.CostUSD)
+	switch {
+	case rec.CostUSD != nil && *rec.CostUSD > 0:
+		s.metrics.CostUSD.WithLabelValues(provider, model).Add(*rec.CostUSD)
+	case rec.CostUSD == nil && rec.Provider != "":
+		// Served but not in the pricing registry: totals are incomplete.
+		s.metrics.Unpriced.WithLabelValues(provider, model).Inc()
 	}
 }
 

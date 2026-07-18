@@ -59,7 +59,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	}
 	wireReq, err := anthropic.ParseMessagesRequest(body, true)
 	if err != nil {
-		rec.Status = http.StatusBadRequest
+		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeAnthropicError(w, http.StatusBadRequest, err.Error(), "invalid_request_error")
 		return
 	}
@@ -68,7 +68,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 
 	ir, err := translate.FromAnthropicRequest(wireReq)
 	if err != nil {
-		rec.Status = http.StatusBadRequest
+		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeAnthropicError(w, http.StatusBadRequest, err.Error(), "invalid_request_error")
 		return
 	}
@@ -79,7 +79,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	rec.RoutePolicy = rt.Router.Name()
 	candidates, err := rt.Router.Route(ctx, ir)
 	if err != nil {
-		f := routeFailure(err)
+		f := routeFailure(&rec, err)
 		rec.Status, rec.ErrorCode = f.status, f.code
 		writeAnthropicError(w, f.status, f.msg, f.code)
 		return
@@ -154,7 +154,7 @@ func (s *Server) handleCountTokens(w http.ResponseWriter, r *http.Request) {
 
 	candidates, err := rt.Router.Route(ctx, ir)
 	if err != nil {
-		f := routeFailure(err)
+		f := routeFailure(&rec, err)
 		writeAnthropicError(w, f.status, f.msg, f.code)
 		return
 	}

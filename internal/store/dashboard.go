@@ -15,13 +15,17 @@ type SpendRow struct {
 	TokensIn  int64   `json:"tokens_in"`
 	TokensOut int64   `json:"tokens_out"`
 	CostUSD   float64 `json:"cost_usd"`
+	// Unpriced: some requests in this row have no pricing entry (cost
+	// logged NULL) — CostUSD is incomplete and must not render as $0.
+	Unpriced bool `json:"unpriced"`
 }
 
 // SpendByDay aggregates served traffic since the cutoff.
 func SpendByDay(db *sql.DB, since time.Time) ([]SpendRow, error) {
 	rows, err := db.Query(`
 		SELECT date(ts/1000, 'unixepoch') AS day, provider, model_served,
-		       COUNT(*), SUM(tokens_in), SUM(tokens_out), SUM(cost_usd)
+		       COUNT(*), SUM(tokens_in), SUM(tokens_out), SUM(cost_usd),
+		       SUM(cost_usd IS NULL)
 		FROM requests
 		WHERE ts >= ? AND provider != ''
 		GROUP BY day, provider, model_served
@@ -33,12 +37,13 @@ func SpendByDay(db *sql.DB, since time.Time) ([]SpendRow, error) {
 	out := []SpendRow{}
 	for rows.Next() {
 		var r SpendRow
-		var tokIn, tokOut sql.NullInt64
+		var tokIn, tokOut, unpriced sql.NullInt64
 		var cost sql.NullFloat64
-		if err := rows.Scan(&r.Day, &r.Provider, &r.Model, &r.Requests, &tokIn, &tokOut, &cost); err != nil {
+		if err := rows.Scan(&r.Day, &r.Provider, &r.Model, &r.Requests, &tokIn, &tokOut, &cost, &unpriced); err != nil {
 			return nil, err
 		}
 		r.TokensIn, r.TokensOut, r.CostUSD = tokIn.Int64, tokOut.Int64, cost.Float64
+		r.Unpriced = unpriced.Int64 > 0
 		out = append(out, r)
 	}
 	return out, rows.Err()
@@ -121,10 +126,10 @@ type DecisionRow struct {
 	ModelServed    string  `json:"model_served"`
 	Policy         string  `json:"policy"`
 	Reason         string  `json:"reason"`
-	Attempts       int     `json:"attempts"`
-	Status         int     `json:"status"`
-	LatencyMS      int64   `json:"latency_ms"`
-	CostUSD        float64 `json:"cost_usd"`
+	Attempts       int      `json:"attempts"`
+	Status         int      `json:"status"`
+	LatencyMS      int64    `json:"latency_ms"`
+	CostUSD        *float64 `json:"cost_usd"` // null = unpriced model
 }
 
 // RecentDecisions returns the newest routing decisions.
@@ -153,7 +158,11 @@ func RecentDecisions(db *sql.DB, limit int) ([]DecisionRow, error) {
 		r.Provider, r.ModelServed = prov.String, served.String
 		r.Policy, r.Reason = policy.String, reason.String
 		r.Attempts, r.Status = int(attempts.Int64), int(status.Int64)
-		r.LatencyMS, r.CostUSD = lat.Int64, cost.Float64
+		r.LatencyMS = lat.Int64
+		if cost.Valid {
+			c := cost.Float64
+			r.CostUSD = &c
+		}
 		out = append(out, r)
 	}
 	return out, rows.Err()

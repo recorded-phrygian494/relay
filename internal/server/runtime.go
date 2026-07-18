@@ -164,14 +164,16 @@ func (rt *Runtime) priceFor(providerName, model string) (in, out float64, ok boo
 	return rt.Pricing.Price(rt.kindsFor(providerName), model)
 }
 
-// cost prices one served request for the log; unknown models cost 0 and
-// the field stays honest (never guessed).
-func (rt *Runtime) cost(providerName, model string, tokensIn, tokensOut int) float64 {
+// cost prices one served request for the log. A model absent from the
+// pricing registry returns nil — logged as NULL, surfaced as "unpriced" —
+// never 0, which would be the dashboard lying about spend.
+func (rt *Runtime) cost(providerName, model string, tokensIn, tokensOut int) *float64 {
 	in, out, ok := rt.priceFor(providerName, model)
 	if !ok {
-		return 0
+		return nil
 	}
-	return (float64(tokensIn)*in + float64(tokensOut)*out) / 1e6
+	c := (float64(tokensIn)*in + float64(tokensOut)*out) / 1e6
+	return &c
 }
 
 // catalogCache merges provider model lists with a TTL. Provider catalog

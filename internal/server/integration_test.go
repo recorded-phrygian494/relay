@@ -169,7 +169,7 @@ func TestBareModelResolvesViaCatalog(t *testing.T) {
 func TestUnknownModel404(t *testing.T) {
 	up := mockUpstream(t)
 	defer up.Close()
-	gw, _ := newTestGateway(t, up.URL, nil)
+	gw, st := newTestGateway(t, up.URL, nil)
 	resp := postChat(t, gw, `{"model":"nope","messages":[{"role":"user","content":"x"}]}`, nil)
 	defer resp.Body.Close()
 	if resp.StatusCode != 404 {
@@ -178,6 +178,17 @@ func TestUnknownModel404(t *testing.T) {
 	b, _ := io.ReadAll(resp.Body)
 	if !strings.Contains(string(b), "model_not_found") {
 		t.Fatalf("body: %s", b)
+	}
+
+	// Failed decisions must still carry a reason — the decisions log is
+	// phase-4 training data; empty strings in it are schema rot.
+	waitForLoggedRequest(t, st, 404)
+	var reason string
+	if err := st.DB().QueryRow(`SELECT route_reason FROM requests WHERE status = 404`).Scan(&reason); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(reason, `"nope" is not an alias`) {
+		t.Fatalf("route_reason on 404: %q", reason)
 	}
 }
 

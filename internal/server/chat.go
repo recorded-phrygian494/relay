@@ -26,12 +26,12 @@ const (
 func (s *Server) readBody(w http.ResponseWriter, r *http.Request, rec *store.Record, writeErr func(http.ResponseWriter, int, string, string)) ([]byte, bool) {
 	body, err := io.ReadAll(io.LimitReader(r.Body, maxBodyBytes+1))
 	if err != nil {
-		rec.Status = http.StatusBadRequest
+		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: unreadable request body"
 		writeErr(w, http.StatusBadRequest, "failed to read request body", "invalid_request")
 		return nil, false
 	}
 	if len(body) > maxBodyBytes {
-		rec.Status = http.StatusRequestEntityTooLarge
+		rec.Status, rec.RouteReason = http.StatusRequestEntityTooLarge, "rejected before routing: request body exceeds 50 MiB"
 		writeErr(w, http.StatusRequestEntityTooLarge, "request body exceeds 50 MiB", "request_too_large")
 		return nil, false
 	}
@@ -63,7 +63,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	}
 	wireReq, err := openai.ParseChatRequest(body)
 	if err != nil {
-		rec.Status = http.StatusBadRequest
+		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeOpenAIError(w, http.StatusBadRequest, err.Error(), "invalid_request")
 		return
 	}
@@ -72,7 +72,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 
 	ir, err := translate.FromOpenAIRequest(wireReq)
 	if err != nil {
-		rec.Status = http.StatusBadRequest
+		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeOpenAIError(w, http.StatusBadRequest, err.Error(), "invalid_request")
 		return
 	}
@@ -83,7 +83,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	rec.RoutePolicy = rt.Router.Name()
 	candidates, err := rt.Router.Route(ctx, ir)
 	if err != nil {
-		f := routeFailure(err)
+		f := routeFailure(&rec, err)
 		rec.Status, rec.ErrorCode = f.status, f.code
 		writeOpenAIError(w, f.status, f.msg, f.code)
 		return

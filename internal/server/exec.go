@@ -41,7 +41,11 @@ var noProviderFailure = failure{
 	msg:    "no configured provider could serve this request",
 }
 
-func routeFailure(err error) failure {
+// routeFailure classifies a Route error and records why the decision
+// failed — every decisions-table row must carry a non-empty reason
+// (it is phase-4 training data and the dashboard's storytelling surface).
+func routeFailure(rec *store.Record, err error) failure {
+	rec.RouteReason = err.Error()
 	if errors.Is(err, router.ErrNoRoute) {
 		return failure{status: http.StatusNotFound, code: "model_not_found", msg: err.Error()}
 	}
@@ -86,7 +90,13 @@ func onAttempt(rt *Runtime, ir *core.Request, rec *store.Record) func(cand route
 	}
 }
 
-func execFailure(err error) failure {
+func execFailure(rec *store.Record, err error) failure {
+	// A decision that failed before any attempt (all breakers open, no
+	// usable key, empty chain) still gets a reason — the decisions log
+	// must never carry empty strings.
+	if rec.RouteReason == "" {
+		rec.RouteReason = "no candidate attempted: " + err.Error()
+	}
 	if errors.Is(err, reliability.ErrNoCandidate) {
 		return noProviderFailure
 	}
@@ -101,7 +111,7 @@ func execFailure(err error) failure {
 func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (*core.Response, failure) {
 	resp, err := rt.Exec.Complete(ctx, ir, candidates, onAttempt(rt, ir, rec))
 	if err != nil {
-		return nil, execFailure(err)
+		return nil, execFailure(rec, err)
 	}
 	return resp, failure{}
 }
@@ -112,7 +122,7 @@ func walkComplete(ctx context.Context, rt *Runtime, ir *core.Request, candidates
 func walkStream(ctx context.Context, rt *Runtime, ir *core.Request, candidates []router.Candidate, rec *store.Record) (core.Stream, failure) {
 	st, err := rt.Exec.Stream(ctx, ir, candidates, onAttempt(rt, ir, rec))
 	if err != nil {
-		return nil, execFailure(err)
+		return nil, execFailure(rec, err)
 	}
 	return st, failure{}
 }

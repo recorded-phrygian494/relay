@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-17",
-  "comment": "Snapshot registry, $/Mtok. Overridable by ~/.relay/pricing.json (or pricing.path in relay.yaml); refresh with 'relay pricing update' — never automatic. Entries match by provider kind (name, profile, or type) and longest model-id prefix.",
+  "version": "2026-07-18",
+  "comment": "Snapshot registry, $/Mtok. Overridable by ~/.relay/pricing.json (or pricing.path in relay.yaml); refresh with 'relay pricing update' — never automatic. Entries match by provider kind (name, profile, or type) and longest model-id prefix. Gemini 3.x prices verified 2026-07-18 against https://ai.google.dev/gemini-api/docs/pricing (paid tier, text input; tiered models use the <=200k-token tier, matching the 2.5-pro convention); contexts from the per-model pages under https://ai.google.dev/gemini-api/docs/models.",
   "models": [
     { "provider": "anthropic", "model": "claude-fable-5", "in": 10.0, "out": 50.0, "context": 1000000 },
     { "provider": "anthropic", "model": "claude-opus-4", "in": 5.0, "out": 25.0, "context": 1000000 },
@@ -19,6 +19,10 @@
     { "provider": "openai", "model": "o3", "in": 2.0, "out": 8.0, "context": 200000 },
     { "provider": "openai", "model": "o4-mini", "in": 1.1, "out": 4.4, "context": 200000 },
 
+    { "provider": "gemini", "model": "gemini-3.5-flash", "in": 1.5, "out": 9.0, "context": 1048576 },
+    { "provider": "gemini", "model": "gemini-3.1-pro-preview", "in": 2.0, "out": 12.0, "context": 1048576 },
+    { "provider": "gemini", "model": "gemini-3.1-flash-lite", "in": 0.25, "out": 1.5, "context": 1048576 },
+    { "provider": "gemini", "model": "gemini-3-flash-preview", "in": 0.5, "out": 3.0, "context": 1048576 },
     { "provider": "gemini", "model": "gemini-2.5-pro", "in": 1.25, "out": 10.0, "context": 1000000 },
     { "provider": "gemini", "model": "gemini-2.5-flash-lite", "in": 0.1, "out": 0.4, "context": 1000000 },
     { "provider": "gemini", "model": "gemini-2.5-flash", "in": 0.3, "out": 2.5, "context": 1000000 },
