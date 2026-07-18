@@ -72,5 +72,5 @@ func (s *Static) Route(ctx context.Context, req *core.Request) ([]Candidate, err
 			Reason:   fmt.Sprintf("static: default provider %q", s.DefaultProvider),
 		}}, nil
 	}
-	return nil, fmt.Errorf("%w: %q", ErrNoRoute, name)
+	return nil, fmt.Errorf("%w: %q is not an alias, a static route, a provider/model pair, or a catalog model", ErrNoRoute, name)
 }
