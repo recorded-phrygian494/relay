@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/llmrelay/relay/internal/cache"
 	"github.com/llmrelay/relay/internal/config"
 	"github.com/llmrelay/relay/internal/pricing"
 	"github.com/llmrelay/relay/internal/provider"
@@ -33,6 +34,7 @@ type Runtime struct {
 	Router    router.Router
 	Exec      *reliability.Executor
 	Pricing   *pricing.Registry
+	Cache     *cache.Exact // nil unless cache.enabled; reset on hot reload
 	catalog   *catalogCache
 
 	// degradedWarned dedupes the DESIGN §0.7 multi_turn_tools warning:
@@ -85,6 +87,13 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		Providers: providers,
 		Pricing:   registry,
 		catalog:   newCatalogCache(providers, 5*time.Minute),
+	}
+	if cfg.Cache.Enabled {
+		ttl := cfg.Cache.TTL.Std()
+		if ttl <= 0 {
+			ttl = 10 * time.Minute // DESIGN §8 default
+		}
+		rt.Cache = cache.NewExact(ttl, 0)
 	}
 	pools := make(map[string]*reliability.KeyPool)
 	for name, pc := range cfg.Providers {

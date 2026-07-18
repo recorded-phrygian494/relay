@@ -50,7 +50,12 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	rec := store.Record{ID: ids.New("req"), TS: start, API: "openai"}
 	defer func() {
 		rec.LatencyMS = time.Since(start).Milliseconds()
-		rec.CostUSD = rt.cost(rec.Provider, rec.ModelServed, rec.TokensIn, rec.TokensOut)
+		if rec.Cached {
+			zero := 0.0
+			rec.CostUSD = &zero // a cache hit is known-free, never "unpriced"
+		} else {
+			rec.CostUSD = rt.cost(rec.Provider, rec.ModelServed, rec.TokensIn, rec.TokensOut)
+		}
 		s.observe(&rec)
 		if s.store != nil {
 			s.store.Log(rec)
@@ -75,6 +80,24 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeOpenAIError(w, http.StatusBadRequest, err.Error(), "invalid_request")
 		return
+	}
+
+	cacheKey, cached := s.cacheLookup(rt, r, ir, &rec)
+	if cached != nil {
+		if !ir.Stream {
+			wire, err := translate.ToOpenAIResponse(cached.Response)
+			if err == nil {
+				writeJSON(w, http.StatusOK, wire)
+				return
+			}
+			// A cached IR that no longer renders is a bug, not a client
+			// problem; fall through to a live completion.
+			rec.Cached = false
+		} else {
+			writer := translate.NewOpenAIStreamWriter(sse.NewWriter(w), time.Now().Unix(), ir.IncludeStreamUsage)
+			replayEvents(cached.Response, writer, &rec)
+			return
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), rt.requestTimeout(ir.Stream))
@@ -105,6 +128,7 @@ func (s *Server) handleChatCompletions(w http.ResponseWriter, r *http.Request) {
 		rec.Status = http.StatusOK
 		rec.TokensIn = resp.Usage.InputTokens
 		rec.TokensOut = resp.Usage.OutputTokens
+		rt.cacheStore(cacheKey, resp, &rec)
 		if rt.Config.Logging.LogPrompts == "full" {
 			if b, err := json.Marshal(wire); err == nil {
 				rec.ResponseBody = string(b)

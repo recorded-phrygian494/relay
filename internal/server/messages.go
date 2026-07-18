@@ -46,7 +46,12 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	rec := store.Record{ID: ids.New("req"), TS: start, API: "anthropic"}
 	defer func() {
 		rec.LatencyMS = time.Since(start).Milliseconds()
-		rec.CostUSD = rt.cost(rec.Provider, rec.ModelServed, rec.TokensIn, rec.TokensOut)
+		if rec.Cached {
+			zero := 0.0
+			rec.CostUSD = &zero // a cache hit is known-free, never "unpriced"
+		} else {
+			rec.CostUSD = rt.cost(rec.Provider, rec.ModelServed, rec.TokensIn, rec.TokensOut)
+		}
 		s.observe(&rec)
 		if s.store != nil {
 			s.store.Log(rec)
@@ -71,6 +76,22 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		rec.Status, rec.RouteReason = http.StatusBadRequest, "rejected before routing: "+err.Error()
 		writeAnthropicError(w, http.StatusBadRequest, err.Error(), "invalid_request_error")
 		return
+	}
+
+	cacheKey, cached := s.cacheLookup(rt, r, ir, &rec)
+	if cached != nil {
+		if !ir.Stream {
+			wire, err := translate.ToAnthropicResponse(cached.Response)
+			if err == nil {
+				writeJSON(w, http.StatusOK, wire)
+				return
+			}
+			rec.Cached = false // cached IR that no longer renders: serve live
+		} else {
+			writer := translate.NewAnthropicStreamWriter(sse.NewWriter(w))
+			replayEvents(cached.Response, writer, &rec)
+			return
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), rt.requestTimeout(ir.Stream))
@@ -101,6 +122,7 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		rec.Status = http.StatusOK
 		rec.TokensIn = resp.Usage.InputTokens
 		rec.TokensOut = resp.Usage.OutputTokens
+		rt.cacheStore(cacheKey, resp, &rec)
 		if rt.Config.Logging.LogPrompts == "full" {
 			if b, err := json.Marshal(wire); err == nil {
 				rec.ResponseBody = string(b)

@@ -619,6 +619,13 @@ normalized). Only cacheable when `temperature == 0` or the client sends
 `x-relay-cache: allow`. Memory LRU, optional SQLite spill. Streams replay as synthetic
 events. Semantic cache: documented extension point (interface exists, one impl: exact).
 
+*As implemented (phase 3):* memory LRU (1024 entries) + TTL, in `package cache`;
+SQLite spill stays on the extension path. The key erases the stream flag and inbound
+dialect, so dialect/stream variants of one request share an entry; only successful
+non-streaming completions populate (streams *hit* via synthetic replay but are not
+re-assembled for storage in v1). Error states are never cached. Hits log
+`policy=cache, cost=$0, tokens=0` and count in `relay_cache_hits_total`.
+
 ---
 
 ## 11. Quality bars (restated as CI gates)

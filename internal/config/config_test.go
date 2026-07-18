@@ -70,16 +70,19 @@ logging: { retain: 90d }
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, field := range []string{"routing.default", "routing.smart", "cache", "translate.strictness", "logging.retain"} {
+	for _, field := range []string{"routing.default", "routing.smart", "translate.strictness", "logging.retain"} {
 		found := false
 		for _, w := range cfg.Warnings {
-			if strings.Contains(w, field) || (field == "cache" && strings.HasPrefix(w, "cache")) {
+			if strings.Contains(w, field) {
 				found = true
 			}
 		}
 		if !found {
 			t.Errorf("reserved field %s: no warning in %v", field, cfg.Warnings)
 		}
+	}
+	if !cfg.Cache.Enabled {
+		t.Fatal("cache.enabled not parsed")
 	}
 	if got := cfg.Logging.Retain.Std(); got != 90*24*time.Hour {
 		t.Fatalf("retain 90d parsed as %v", got)

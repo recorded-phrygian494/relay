@@ -295,9 +295,6 @@ func (c *Config) finalize() error {
 	if c.Logging.Retain != 0 {
 		c.Warnings = append(c.Warnings, "logging.retain: log retention is not implemented yet; ignored")
 	}
-	if c.Cache.Enabled {
-		c.Warnings = append(c.Warnings, "cache: not implemented yet; ignored")
-	}
 	if c.Logging.DB == "" {
 		c.Logging.DB = DefaultDBPath()
 	}

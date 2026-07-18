@@ -25,6 +25,8 @@ type Metrics struct {
 	Unpriced  *prometheus.CounterVec
 	Breakers    *prometheus.GaugeVec
 	KeysCooling *prometheus.GaugeVec
+	CacheHits   prometheus.Counter
+	CacheMisses prometheus.Counter
 	LogDrops    prometheus.CounterFunc
 }
 
@@ -72,8 +74,16 @@ func New(droppedFn func() float64) *Metrics {
 			Name: "relay_keys_cooling",
 			Help: "API keys currently in rate-limit cooldown per provider.",
 		}, []string{"provider"}),
+		CacheHits: prometheus.NewCounter(prometheus.CounterOpts{
+			Name: "relay_cache_hits_total",
+			Help: "Requests served from the exact-match cache.",
+		}),
+		CacheMisses: prometheus.NewCounter(prometheus.CounterOpts{
+			Name: "relay_cache_misses_total",
+			Help: "Cache-eligible requests that missed and went upstream.",
+		}),
 	}
-	reg.MustRegister(m.Requests, m.Latency, m.TTFT, m.TokensIn, m.TokensOut, m.CostUSD, m.Unpriced, m.Breakers, m.KeysCooling)
+	reg.MustRegister(m.Requests, m.Latency, m.TTFT, m.TokensIn, m.TokensOut, m.CostUSD, m.Unpriced, m.Breakers, m.KeysCooling, m.CacheHits, m.CacheMisses)
 	reg.MustRegister(collectors.NewGoCollector())
 	if droppedFn != nil {
 		m.LogDrops = prometheus.NewCounterFunc(prometheus.CounterOpts{
