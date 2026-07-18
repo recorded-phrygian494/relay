@@ -278,6 +278,39 @@ func (c *Client) Complete(ctx context.Context, req *core.Request) (*core.Respons
 	}, nil
 }
 
+// Embed implements provider.Embedder via POST /api/embed. Ollama has no
+// dimensions parameter; a non-zero Dimensions is rejected rather than
+// silently returning full-width vectors.
+func (c *Client) Embed(ctx context.Context, req *provider.EmbedRequest) (*provider.EmbedResponse, error) {
+	if req.Dimensions > 0 {
+		return nil, provider.NewError(c.name, 400, "invalid_request",
+			"ollama does not support the dimensions parameter", nil)
+	}
+	resp, err := c.post(ctx, "/api/embed", map[string]any{
+		"model": req.Model,
+		"input": req.Input,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var out struct {
+		Embeddings      [][]float32 `json:"embeddings"`
+		PromptEvalCount int         `json:"prompt_eval_count"`
+		Error           string      `json:"error"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return nil, provider.Transport(c.name, fmt.Errorf("decoding embeddings: %w", err))
+	}
+	if out.Error != "" {
+		return nil, provider.NewError(c.name, http.StatusOK, "", out.Error, nil)
+	}
+	if len(out.Embeddings) != len(req.Input) {
+		return nil, provider.Transport(c.name, fmt.Errorf("got %d embeddings for %d inputs", len(out.Embeddings), len(req.Input)))
+	}
+	return &provider.EmbedResponse{Vectors: out.Embeddings, TokensIn: out.PromptEvalCount}, nil
+}
+
 // Stream implements Provider.
 func (c *Client) Stream(ctx context.Context, req *core.Request) (core.Stream, error) {
 	body, err := c.buildRequest(req, true)

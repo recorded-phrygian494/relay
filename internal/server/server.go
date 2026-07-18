@@ -99,6 +99,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /v1/chat/completions", s.auth(s.handleChatCompletions))
 	mux.HandleFunc("POST /v1/messages", s.auth(s.handleMessages))
 	mux.HandleFunc("POST /v1/messages/count_tokens", s.auth(s.handleCountTokens))
+	mux.HandleFunc("POST /v1/embeddings", s.auth(s.handleEmbeddings))
 	promHandler := s.metrics.Handler()
 	mux.Handle("GET /metrics", s.auth(func(w http.ResponseWriter, r *http.Request) {
 		s.refreshGauges()

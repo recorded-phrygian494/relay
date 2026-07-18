@@ -155,6 +155,58 @@ func (c *Client) Stream(ctx context.Context, req *core.Request) (core.Stream, er
 	return translate.NewOpenAIStream(resp.Body), nil
 }
 
+// Embed implements provider.Embedder via POST /embeddings. Float encoding
+// is requested explicitly; index order is restored from the response.
+func (c *Client) Embed(ctx context.Context, req *provider.EmbedRequest) (*provider.EmbedResponse, error) {
+	wire := struct {
+		Model          string   `json:"model"`
+		Input          []string `json:"input"`
+		EncodingFormat string   `json:"encoding_format"`
+		Dimensions     int      `json:"dimensions,omitempty"`
+	}{Model: req.Model, Input: req.Input, EncodingFormat: "float", Dimensions: req.Dimensions}
+	body, err := json.Marshal(wire)
+	if err != nil {
+		return nil, err
+	}
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/embeddings", body)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.http.Do(httpReq)
+	if err != nil {
+		return nil, provider.Transport(c.cfg.Name, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, c.apiError(resp)
+	}
+	var out struct {
+		Data []struct {
+			Index     int       `json:"index"`
+			Embedding []float32 `json:"embedding"`
+		} `json:"data"`
+		Usage struct {
+			PromptTokens int `json:"prompt_tokens"`
+		} `json:"usage"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return nil, provider.Transport(c.cfg.Name, fmt.Errorf("decoding embeddings: %w", err))
+	}
+	vectors := make([][]float32, len(req.Input))
+	for _, d := range out.Data {
+		if d.Index < 0 || d.Index >= len(vectors) {
+			return nil, provider.Transport(c.cfg.Name, fmt.Errorf("embeddings index %d out of range", d.Index))
+		}
+		vectors[d.Index] = d.Embedding
+	}
+	for i, v := range vectors {
+		if v == nil {
+			return nil, provider.Transport(c.cfg.Name, fmt.Errorf("no embedding returned for input %d", i))
+		}
+	}
+	return &provider.EmbedResponse{Vectors: vectors, TokensIn: out.Usage.PromptTokens}, nil
+}
+
 // Models implements Provider.
 func (c *Client) Models(ctx context.Context) ([]provider.Model, error) {
 	path := c.cfg.Quirks.ModelsPath

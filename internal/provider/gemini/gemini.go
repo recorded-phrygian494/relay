@@ -397,6 +397,46 @@ func missingSignatureError(name string, raw []byte) *provider.Error {
 	}
 }
 
+// Embed implements provider.Embedder via v1beta batchEmbedContents
+// (https://ai.google.dev/api/embeddings). Dimensions maps to
+// outputDimensionality; usage is not reported per-batch, so TokensIn is 0.
+func (c *Client) Embed(ctx context.Context, req *provider.EmbedRequest) (*provider.EmbedResponse, error) {
+	type embedContent struct {
+		Model                string `json:"model"`
+		Content              any    `json:"content"`
+		OutputDimensionality int    `json:"outputDimensionality,omitempty"`
+	}
+	reqs := make([]embedContent, len(req.Input))
+	for i, text := range req.Input {
+		reqs[i] = embedContent{
+			Model:                "models/" + req.Model,
+			Content:              map[string]any{"parts": []map[string]string{{"text": text}}},
+			OutputDimensionality: req.Dimensions,
+		}
+	}
+	resp, err := c.post(ctx, "/models/"+req.Model+":batchEmbedContents", map[string]any{"requests": reqs}, false)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var out struct {
+		Embeddings []struct {
+			Values []float32 `json:"values"`
+		} `json:"embeddings"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return nil, provider.Transport(c.name, fmt.Errorf("decoding embeddings: %w", err))
+	}
+	if len(out.Embeddings) != len(req.Input) {
+		return nil, provider.Transport(c.name, fmt.Errorf("got %d embeddings for %d inputs", len(out.Embeddings), len(req.Input)))
+	}
+	vectors := make([][]float32, len(out.Embeddings))
+	for i, e := range out.Embeddings {
+		vectors[i] = e.Values
+	}
+	return &provider.EmbedResponse{Vectors: vectors}, nil
+}
+
 // Capabilities implements provider.ModelCapabilities: Gemini 3 models
 // validate thought signatures on function-call replay, which relay cannot
 // carry cross-dialect — multi-turn tool use is degraded (DESIGN §0.7).

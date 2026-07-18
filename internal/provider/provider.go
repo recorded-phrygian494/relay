@@ -69,6 +69,30 @@ type ModelCapabilities interface {
 	Capabilities(model string) Capabilities
 }
 
+// EmbedRequest is one embeddings call in the neutral IR. Only text inputs
+// cross providers; the inbound handler rejects OpenAI token-array inputs
+// with an explanation rather than guessing a tokenizer.
+type EmbedRequest struct {
+	Model string
+	Input []string
+	// Dimensions truncates the output vectors when > 0 and the provider
+	// supports it (OpenAI dimensions / Gemini outputDimensionality).
+	Dimensions int
+}
+
+// EmbedResponse carries one vector per input, in input order.
+type EmbedResponse struct {
+	Vectors  [][]float32
+	TokensIn int // 0 when the provider does not report usage
+}
+
+// Embedder is an optional Provider extension for /v1/embeddings.
+// Providers without an embeddings API (Anthropic) simply do not implement
+// it, and the inbound handler answers with an honest 404.
+type Embedder interface {
+	Embed(ctx context.Context, req *EmbedRequest) (*EmbedResponse, error)
+}
+
 // Error is a normalized upstream failure. Raw preserves the provider's
 // original error body for debugging.
 type Error struct {
