@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>relay dashboard</title>
+<style>
+  :root { color-scheme: light dark; --line: #8884; --dim: #888; }
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem auto; max-width: 72rem; padding: 0 1rem; }
+  h1 { font-size: 1.3rem; } h1 small { color: var(--dim); font-weight: normal; }
+  h2 { font-size: 1.05rem; margin-top: 2rem; border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: .3rem .6rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--dim); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.reason { white-space: normal; color: var(--dim); max-width: 34rem; }
+  td.warn { color: #c60; }
+  .err { color: #c33; }
+  #meta { color: var(--dim); }
+</style>
+</head>
+<body>
+<h1>relay <small id="meta"></small></h1>
+<div id="error" class="err"></div>
+
+<h2>Spend by day</h2>
+<table id="spend"><thead><tr>
+  <th>day</th><th>provider</th><th>model</th>
+  <th class="num">requests</th><th class="num">tok in</th><th class="num">tok out</th><th class="num">$</th>
+</tr></thead><tbody></tbody></table>
+
+<h2>Latency (24h, p50 / p95 / p99)</h2>
+<table id="latency"><thead><tr>
+  <th>provider</th><th>model</th><th class="num">requests</th>
+  <th class="num">p50</th><th class="num">p95</th><th class="num">p99</th><th class="num">ttft p50</th>
+</tr></thead><tbody></tbody></table>
+
+<h2>Recent routing decisions</h2>
+<table id="recent"><thead><tr>
+  <th>time</th><th>requested</th><th>served</th><th>policy</th>
+  <th class="num">att</th><th class="num">status</th><th class="num">ms</th><th class="num">$</th><th>reason</th>
+</tr></thead><tbody></tbody></table>
+
+<script>
+const fmt = n => n == null ? "" : n.toLocaleString();
+const usd = n => n ? "$" + n.toFixed(n < 0.1 ? 5 : 2) : "";
+const cell = (tr, text, cls) => { const td = document.createElement("td"); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td); };
+
+async function refresh() {
+  let d;
+  try {
+    const resp = await fetch("dashboard/data");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    d = await resp.json();
+    document.getElementById("error").textContent = "";
+  } catch (e) {
+    document.getElementById("error").textContent = "failed to load data: " + e.message;
+    return;
+  }
+  document.getElementById("meta").textContent =
+    "v" + d.version + " · " + new Date().toLocaleTimeString() +
+    (d.log_dropped ? " · " + fmt(d.log_dropped) + " log records dropped" : "");
+
+  const spend = document.querySelector("#spend tbody"); spend.replaceChildren();
+  for (const r of d.spend) {
+    const tr = document.createElement("tr");
+    cell(tr, r.day); cell(tr, r.provider); cell(tr, r.model);
+    cell(tr, fmt(r.requests), "num"); cell(tr, fmt(r.tokens_in), "num");
+    cell(tr, fmt(r.tokens_out), "num"); cell(tr, usd(r.cost_usd), "num");
+    spend.appendChild(tr);
+  }
+
+  const lat = document.querySelector("#latency tbody"); lat.replaceChildren();
+  for (const r of d.latency) {
+    const tr = document.createElement("tr");
+    cell(tr, r.provider); cell(tr, r.model); cell(tr, fmt(r.requests), "num");
+    cell(tr, fmt(r.p50_ms), "num"); cell(tr, fmt(r.p95_ms), "num");
+    cell(tr, fmt(r.p99_ms), "num"); cell(tr, fmt(r.ttft_p50_ms), "num");
+    lat.appendChild(tr);
+  }
+
+  const rec = document.querySelector("#recent tbody"); rec.replaceChildren();
+  for (const r of d.recent) {
+    const tr = document.createElement("tr");
+    cell(tr, r.ts.replace("T", " ").replace("Z", ""));
+    cell(tr, r.model_requested);
+    cell(tr, r.provider ? r.provider + "/" + r.model_served : "");
+    cell(tr, r.policy);
+    cell(tr, fmt(r.attempts), "num");
+    cell(tr, r.status, r.status >= 400 ? "num err" : "num");
+    cell(tr, fmt(r.latency_ms), "num"); cell(tr, usd(r.cost_usd), "num");
+    cell(tr, r.reason, r.reason.includes("warning:") ? "reason warn" : "reason");
+    rec.appendChild(tr);
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

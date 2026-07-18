@@ -51,6 +51,24 @@ func (p *KeyPool) Next() (string, bool) {
 	return "", false
 }
 
+// Cooling reports how many keys are currently in cooldown. Nil-safe (a
+// nil pool has no keys to cool).
+func (p *KeyPool) Cooling() int {
+	if p == nil {
+		return 0
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	now := p.now()
+	n := 0
+	for _, until := range p.cool {
+		if now.Before(until) {
+			n++
+		}
+	}
+	return n
+}
+
 // Cooldown removes a key from rotation for d (a 429, per DESIGN §6).
 func (p *KeyPool) Cooldown(key string, d time.Duration) {
 	if d <= 0 {

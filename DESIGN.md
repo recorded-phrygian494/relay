@@ -5,9 +5,10 @@
 > outbound (BYOK), with pluggable routing policies from `static` to learned `smart`
 > routing. Zero telemetry. Apache-2.0.
 
-Status: **Phases 1–2 complete; Phase 3 in progress (Step 0 corpus audit done
-2026-07-16 — findings in `docs/quirks.md`, one decision pending in §0.7).** This
-document is kept current as the code evolves.
+Status: **Phases 1–2 complete; Phase 3 in progress — corpus audit, §0.7 resolution,
+alias routers, reliability suite, pricing+cost, and observability (Prometheus
+`/metrics` + `/dashboard`, done 2026-07-18) are in; remaining: `/v1/embeddings`,
+cache.** This document is kept current as the code evolves.
 
 **Standing convention:** any decision where the implementation disagrees with the spec
 or the reviewer — or wants to — gets argued *in writing* in §0 before code is written.
