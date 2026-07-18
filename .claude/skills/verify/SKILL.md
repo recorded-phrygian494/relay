@@ -41,8 +41,12 @@ Gotchas:
 - OpenAI dialect: `POST /v1/chat/completions` with `{"model":"fast",...}`.
 - Anthropic dialect: `POST /v1/messages` (add `"max_tokens"`, `"stream":true`
   to exercise SSE/TTFT).
+- Embeddings: `POST /v1/embeddings` `{"model":"gemini/gemini-embedding-001","input":["a"]}`.
+- Cache (needs `cache: {enabled: true}` in config): same body twice with
+  `"temperature":0` → second decision logs `policy=cache`; counters in /metrics.
 - Failure path: request a nonexistent model → 404 routed decision.
 - `GET /dashboard/data` (JSON), `GET /metrics` (Prometheus), `GET /dashboard`.
+- Overhead gate: `go test ./internal/server/ -run TestOverheadBudget -v`.
 - Dashboard screenshot: headless Edge works —
   `& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless
   --disable-gpu --window-size=1200,900 --virtual-time-budget=6000
