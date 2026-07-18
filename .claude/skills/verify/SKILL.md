@@ -53,3 +53,10 @@ Gotchas:
   --screenshot=$scratch\dash.png http://127.0.0.1:4100/dashboard`
 - Piping JSON through `python -m json.tool` mojibakes UTF-8 (cp1252 stdin) —
   check raw bytes before blaming the server.
+
+## Smart routing (phase 4)
+
+- `routing: {default: smart, smart: {easy: gemini/gemini-3.1-flash-lite, hard: anthropic/claude-haiku-4-5, embeddings: ollama/nomic-embed-text, tier: knn}}` — Ollama runs locally with nomic-embed-text pulled; tier-2 verification is free and private.
+- Drive: `{"model":"auto"}` with an easy greeting vs a proof/derivation prompt → decisions log shows `smart → easy/hard chain [knn: 5 neighbors ...]` with named evidence.
+- `relay eval --embedder ollama/nomic-embed-text --json out.json` runs the §0.3 gate (dry-run, no spend).
+- `relay train --implicit` / `--replay N --judge p/m --dry-run` (estimate always prints first; `--yes` to spend).
