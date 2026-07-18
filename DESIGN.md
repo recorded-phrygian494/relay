@@ -543,7 +543,7 @@ providers:
     base_url: "http://localhost:11434"
 
 routing:
-  default: smart                        # policy for unaliased model names
+  default: smart                        # policy for unaliased model names — reserved; warns + routes statically until phase 4
   aliases:
     fast:  [groq/llama-3.3-70b, openai/gpt-4o-mini]
     cheap: { policy: cheapest, candidates: [ollama/*, openai/gpt-4o-mini] }

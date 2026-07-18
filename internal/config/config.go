@@ -17,13 +17,18 @@ import (
 	"github.com/llmrelay/relay/internal/provider/openaicompat"
 )
 
-// Config is the root of relay.yaml.
+// Config is the root of relay.yaml. Every key of the DESIGN §8 example is
+// known to the parser — fields whose feature has not landed yet parse and
+// emit a "reserved, ignored" warning rather than failing the strict
+// unknown-field check, so the documented example always loads.
 type Config struct {
 	Server      Server              `yaml:"server"`
 	Providers   map[string]Provider `yaml:"providers"`
 	Routing     Routing             `yaml:"routing"`
 	Logging     Logging             `yaml:"logging"`
 	Reliability Reliability         `yaml:"reliability"`
+	Cache       Cache               `yaml:"cache"`
+	Translate   Translate           `yaml:"translate"`
 
 	// Path is the file this config was loaded from; empty for zero-config.
 	Path string `yaml:"-"`
@@ -57,6 +62,21 @@ type Routing struct {
 	// Aliases are virtual model names: a plain list is a fallback chain; a
 	// mapping selects a policy (DESIGN §7/§8).
 	Aliases map[string]Alias `yaml:"aliases"`
+	// Default and Smart are reserved for smart routing (phase 4): parsed
+	// so the §8 example loads, warned about, and ignored until then.
+	Default string            `yaml:"default"`
+	Smart   map[string]string `yaml:"smart"`
+}
+
+// Cache configures the exact-match response cache (DESIGN §8).
+type Cache struct {
+	Enabled bool     `yaml:"enabled"`
+	TTL     Duration `yaml:"ttl"`
+}
+
+// Translate is reserved: v1 always warns on lossy translation (DESIGN §8).
+type Translate struct {
+	Strictness string `yaml:"strictness"`
 }
 
 // Alias is one virtual model. Two YAML shapes are accepted:
@@ -100,11 +120,19 @@ func (a *Alias) UnmarshalYAML(node *yaml.Node) error {
 // Duration decodes yaml scalars like "30s" / "5m".
 type Duration time.Duration
 
-// UnmarshalYAML implements yaml.Unmarshaler.
+// UnmarshalYAML implements yaml.Unmarshaler. On top of time.ParseDuration
+// it accepts a whole-day "Nd" suffix ("90d"), used by logging.retain.
 func (d *Duration) UnmarshalYAML(node *yaml.Node) error {
 	var s string
 	if err := node.Decode(&s); err != nil {
 		return err
+	}
+	if days, ok := strings.CutSuffix(s, "d"); ok && !strings.ContainsAny(days, "hms") {
+		var n float64
+		if _, err := fmt.Sscanf(days, "%g", &n); err == nil {
+			*d = Duration(time.Duration(n * 24 * float64(time.Hour)))
+			return nil
+		}
 	}
 	v, err := time.ParseDuration(s)
 	if err != nil {
@@ -139,6 +167,8 @@ func (r Reliability) RetryCount() int {
 // Logging configures the local SQLite request log.
 type Logging struct {
 	DB string `yaml:"db"`
+	// Retain is reserved: log retention is not implemented yet.
+	Retain Duration `yaml:"retain"`
 	// LogPrompts: "off" (default) | "embeddings" | "full" (DESIGN §8).
 	LogPrompts string `yaml:"log_prompts"`
 }
@@ -249,6 +279,24 @@ func Load(path string) (*Config, error) {
 func (c *Config) finalize() error {
 	if c.Server.Listen == "" {
 		c.Server.Listen = DefaultListen
+	}
+	// Reserved fields: accepted so the DESIGN §8 example loads verbatim,
+	// but inert until their feature lands — say so instead of silently
+	// pretending.
+	if c.Routing.Default != "" {
+		c.Warnings = append(c.Warnings, "routing.default is reserved for smart routing (phase 4); ignored — unaliased models route statically")
+	}
+	if len(c.Routing.Smart) > 0 {
+		c.Warnings = append(c.Warnings, "routing.smart is reserved for smart routing (phase 4); ignored")
+	}
+	if c.Translate.Strictness != "" && c.Translate.Strictness != "warn" {
+		c.Warnings = append(c.Warnings, fmt.Sprintf("translate.strictness: only %q is implemented; %q ignored", "warn", c.Translate.Strictness))
+	}
+	if c.Logging.Retain != 0 {
+		c.Warnings = append(c.Warnings, "logging.retain: log retention is not implemented yet; ignored")
+	}
+	if c.Cache.Enabled {
+		c.Warnings = append(c.Warnings, "cache: not implemented yet; ignored")
 	}
 	if c.Logging.DB == "" {
 		c.Logging.DB = DefaultDBPath()

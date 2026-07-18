@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func writeConfig(t *testing.T, content string) string {
@@ -54,19 +55,50 @@ routing:
 	}
 }
 
+func TestReservedFieldsWarnNotError(t *testing.T) {
+	cfg, err := Load(writeConfig(t, `
+providers:
+  openai: {}
+routing:
+  default: smart
+  smart:
+    easy: cheap
+cache: { enabled: true, ttl: 10m }
+translate: { strictness: strict }
+logging: { retain: 90d }
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, field := range []string{"routing.default", "routing.smart", "cache", "translate.strictness", "logging.retain"} {
+		found := false
+		for _, w := range cfg.Warnings {
+			if strings.Contains(w, field) || (field == "cache" && strings.HasPrefix(w, "cache")) {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("reserved field %s: no warning in %v", field, cfg.Warnings)
+		}
+	}
+	if got := cfg.Logging.Retain.Std(); got != 90*24*time.Hour {
+		t.Fatalf("retain 90d parsed as %v", got)
+	}
+}
+
 func TestLoadRejectsBadConfig(t *testing.T) {
 	cases := map[string]string{
-		"unknown provider type": "providers:\n  x:\n    type: bogus\n",
-		"compat without url":    "providers:\n  x:\n    type: openai-compat\n",
-		"bad static route":      "providers:\n  openai: {}\nrouting:\n  static:\n    fast: not-a-pair\n",
+		"unknown provider type":  "providers:\n  x:\n    type: bogus\n",
+		"compat without url":     "providers:\n  x:\n    type: openai-compat\n",
+		"bad static route":       "providers:\n  openai: {}\nrouting:\n  static:\n    fast: not-a-pair\n",
 		"unknown route provider": "providers:\n  openai: {}\nrouting:\n  static:\n    fast: nope/model\n",
-		"unknown log_prompts":   "logging:\n  log_prompts: everything\n",
-		"unknown yaml field":    "servers:\n  listen: x\n",
-		"alias unknown policy":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: smartest, candidates: [openai/gpt-4o]}\n",
-		"alias empty":           "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: cheapest}\n",
-		"alias bad target":      "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: [nowhere/model]\n",
-		"weighted no children":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: weighted, candidates: [openai/a]}\n",
-		"weighted zero weight":  "providers:\n  openai: {}\nrouting:\n  aliases:\n    x:\n      policy: weighted\n      children: [{target: openai/a, weight: 0}]\n",
+		"unknown log_prompts":    "logging:\n  log_prompts: everything\n",
+		"unknown yaml field":     "servers:\n  listen: x\n",
+		"alias unknown policy":   "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: smartest, candidates: [openai/gpt-4o]}\n",
+		"alias empty":            "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: cheapest}\n",
+		"alias bad target":       "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: [nowhere/model]\n",
+		"weighted no children":   "providers:\n  openai: {}\nrouting:\n  aliases:\n    x: {policy: weighted, candidates: [openai/a]}\n",
+		"weighted zero weight":   "providers:\n  openai: {}\nrouting:\n  aliases:\n    x:\n      policy: weighted\n      children: [{target: openai/a, weight: 0}]\n",
 	}
 	for name, content := range cases {
 		if _, err := Load(writeConfig(t, content)); err == nil {
