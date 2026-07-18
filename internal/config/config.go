@@ -5,7 +5,9 @@ package config
 
 import (
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -62,10 +64,33 @@ type Routing struct {
 	// Aliases are virtual model names: a plain list is a fallback chain; a
 	// mapping selects a policy (DESIGN §7/§8).
 	Aliases map[string]Alias `yaml:"aliases"`
-	// Default and Smart are reserved for smart routing (phase 4): parsed
-	// so the §8 example loads, warned about, and ignored until then.
-	Default string            `yaml:"default"`
-	Smart   map[string]string `yaml:"smart"`
+	// Default is the policy for otherwise-unroutable model names:
+	// "static" (default — such names 404) or "smart" (DESIGN §0.3).
+	Default string `yaml:"default"`
+	// Smart configures the smart policy; only consulted when Default is
+	// "smart".
+	Smart SmartRouting `yaml:"smart"`
+}
+
+// SmartRouting configures tiered smart routing (DESIGN §0.3).
+type SmartRouting struct {
+	// Easy and Hard are the difficulty chains: an alias name or a bare
+	// provider/model.
+	Easy string `yaml:"easy"`
+	Hard string `yaml:"hard"`
+	// Embeddings is the "provider/model" that embeds queries for the
+	// KNN tier (dogfoods relay's own embeddings path).
+	Embeddings string `yaml:"embeddings"`
+	// AllowRemoteEmbeddings must be set explicitly when Embeddings is not
+	// a local provider: smart routing silently shipping prompts to a
+	// remote API would violate the privacy posture.
+	AllowRemoteEmbeddings bool `yaml:"allow_remote_embeddings"`
+	// Tier selects the classifier: "lexical" (tier 1, pure Go) or "knn"
+	// (tier 2, embedding KNN). Empty selects the launch-gate default.
+	Tier string `yaml:"tier"`
+	// Reference is the tier-2 reference-set path (default
+	// ~/.relay/smart_refs.json).
+	Reference string `yaml:"reference"`
 }
 
 // Cache configures the exact-match response cache (DESIGN §8).
@@ -254,6 +279,15 @@ func DefaultDBPath() string {
 	return filepath.Join(home, ".relay", defaultDBName)
 }
 
+// DefaultSmartRefsPath is where the tier-2 reference set persists.
+func DefaultSmartRefsPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "smart_refs.json"
+	}
+	return filepath.Join(home, ".relay", "smart_refs.json")
+}
+
 // Load reads and validates a config file.
 func Load(path string) (*Config, error) {
 	raw, err := os.ReadFile(path)
@@ -283,12 +317,6 @@ func (c *Config) finalize() error {
 	// Reserved fields: accepted so the DESIGN §8 example loads verbatim,
 	// but inert until their feature lands — say so instead of silently
 	// pretending.
-	if c.Routing.Default != "" {
-		c.Warnings = append(c.Warnings, "routing.default is reserved for smart routing (phase 4); ignored — unaliased models route statically")
-	}
-	if len(c.Routing.Smart) > 0 {
-		c.Warnings = append(c.Warnings, "routing.smart is reserved for smart routing (phase 4); ignored")
-	}
 	if c.Translate.Strictness != "" && c.Translate.Strictness != "warn" {
 		c.Warnings = append(c.Warnings, fmt.Sprintf("translate.strictness: only %q is implemented; %q ignored", "warn", c.Translate.Strictness))
 	}
@@ -405,7 +433,87 @@ func (c *Config) finalize() error {
 			return fmt.Errorf("routing.default_provider: unknown provider %q", dp)
 		}
 	}
+
+	switch c.Routing.Default {
+	case "", "static":
+	case "smart":
+		s := &c.Routing.Smart
+		if s.Easy == "" || s.Hard == "" {
+			return fmt.Errorf("routing.default: smart requires routing.smart.easy and routing.smart.hard chains")
+		}
+		for _, t := range []struct{ field, target string }{{"easy", s.Easy}, {"hard", s.Hard}} {
+			if err := c.validateChainTarget(t.target); err != nil {
+				return fmt.Errorf("routing.smart.%s: %w", t.field, err)
+			}
+		}
+		switch s.Tier {
+		case "", "lexical":
+		case "knn":
+			if s.Embeddings == "" {
+				return fmt.Errorf("routing.smart.tier: knn requires routing.smart.embeddings")
+			}
+		default:
+			return fmt.Errorf("routing.smart.tier: unknown tier %q (want lexical | knn)", s.Tier)
+		}
+	default:
+		return fmt.Errorf("routing.default: unknown policy %q (want static | smart)", c.Routing.Default)
+	}
+	if e := c.Routing.Smart.Embeddings; e != "" {
+		prov, _, ok := strings.Cut(e, "/")
+		if !ok {
+			return fmt.Errorf("routing.smart.embeddings: %q is not provider/model", e)
+		}
+		pc, exists := c.Providers[prov]
+		if !exists {
+			return fmt.Errorf("routing.smart.embeddings: unknown provider %q", prov)
+		}
+		if !providerIsLocal(pc) {
+			// Privacy posture: smart routing must never silently ship
+			// prompts to a remote API just to classify them.
+			if !c.Routing.Smart.AllowRemoteEmbeddings {
+				return fmt.Errorf("routing.smart.embeddings: %q is a remote provider — routing would send every prompt to it for classification; set routing.smart.allow_remote_embeddings: true to accept that", prov)
+			}
+			c.Warnings = append(c.Warnings, fmt.Sprintf(
+				"routing.smart: prompts will be sent to remote provider %q for routing classification (allow_remote_embeddings: true)", prov))
+		}
+	}
+	if c.Logging.LogPrompts == "embeddings" && c.Routing.Smart.Embeddings == "" {
+		c.Warnings = append(c.Warnings, "logging.log_prompts: \"embeddings\" needs an embedding source (routing.smart.embeddings); falling back to \"off\"")
+		c.Logging.LogPrompts = "off"
+	}
 	return nil
+}
+
+// validateChainTarget accepts an alias name or a provider/model pair.
+func (c *Config) validateChainTarget(target string) error {
+	if _, isAlias := c.Routing.Aliases[target]; isAlias {
+		return nil
+	}
+	prov, _, ok := strings.Cut(target, "/")
+	if ok {
+		if _, exists := c.Providers[prov]; exists {
+			return nil
+		}
+	}
+	return fmt.Errorf("target %q is neither a configured alias nor provider/model", target)
+}
+
+// providerIsLocal reports whether an embedder stays on this machine:
+// Ollama, or any provider whose base_url points at a loopback host.
+func providerIsLocal(p Provider) bool {
+	if p.Type == "ollama" {
+		return true
+	}
+	u, err := url.Parse(p.BaseURL)
+	if err != nil || u.Host == "" {
+		return false
+	}
+	host := u.Hostname()
+	if host == "localhost" {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // Find locates the config file: explicit path, ./relay.yaml, then

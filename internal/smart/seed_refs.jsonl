@@ -1,0 +1,37 @@
+{"id":"seed-chat-01","text":"morning!! ready for friday?","difficulty":0.08,"domain":"chitchat"}
+{"id":"seed-chat-02","text":"haha yeah exactly. ok gotta run, talk later","difficulty":0.06,"domain":"chitchat"}
+{"id":"seed-chat-03","text":"could you make this sound warmer: 'Your request was denied.'","difficulty":0.18,"domain":"chitchat"}
+{"id":"seed-chat-04","text":"ugh, spilled tea on my keyboard again. anyway. how do I un-stick a spacebar, kidding, don't answer that","difficulty":0.12,"domain":"chitchat"}
+{"id":"seed-chat-05","text":"write a short birthday message for my coworker who loves hiking","difficulty":0.15,"domain":"chitchat"}
+{"id":"seed-qa-01","text":"what's the tallest mountain in South America?","difficulty":0.15,"domain":"qa"}
+{"id":"seed-qa-02","text":"how many grams in an ounce?","difficulty":0.12,"domain":"qa"}
+{"id":"seed-qa-03","text":"who painted The Night Watch?","difficulty":0.14,"domain":"qa"}
+{"id":"seed-qa-04","text":"what does the 'S' in HTTPS stand for and why does it matter?","difficulty":0.24,"domain":"qa"}
+{"id":"seed-qa-05","text":"is it cheaper to run the dishwasher at night? general answer is fine","difficulty":0.2,"domain":"qa"}
+{"id":"seed-extract-01","text":"grab the phone numbers out of this and give me a JSON list: 'call 555-0142 before noon, else try 555-9931'","difficulty":0.25,"domain":"extraction"}
+{"id":"seed-extract-02","text":"turn this into {\"city\":..., \"temp_c\":...}: 'Lisbon hit 31C today'","difficulty":0.22,"domain":"extraction"}
+{"id":"seed-extract-03","text":"list every version number mentioned: 'upgrade path is 1.9 to 2.0.1, skipping 2.0.0 which was pulled'","difficulty":0.28,"domain":"extraction"}
+{"id":"seed-extract-04","text":"from this receipt text, pull vendor, total, and date as JSON: 'GREENMART #204 07/02/2026 TOTAL $43.18'","difficulty":0.3,"domain":"extraction"}
+{"id":"seed-sum-01","text":"boil this down to one sentence: 'The committee reviewed three vendor proposals. Vendor B was cheapest but lacked SSO; Vendor A met all requirements at 20% higher cost; Vendor C was eliminated for compliance gaps. The committee recommends Vendor A.'","difficulty":0.38,"domain":"summarize"}
+{"id":"seed-sum-02","text":"give me the gist of this in two bullets: 'Migration to the new billing system completes next month. Invoices generated before the cutover remain in the old portal for one year. Auto-pay settings do not carry over and must be re-entered. Support for CSV export arrives in Q4.'","difficulty":0.42,"domain":"summarize"}
+{"id":"seed-sum-03","text":"shorten this PR description to something reviewers will actually read: 'This change refactors the retry middleware to unify backoff handling across HTTP and gRPC clients, removes the duplicated jitter implementation, adds property-based tests for the backoff calculator, and fixes a latent bug where the retry budget was shared across unrelated requests.'","difficulty":0.45,"domain":"summarize"}
+{"id":"seed-code-01","text":"write a function in JS that groups an array of objects by a key","difficulty":0.5,"domain":"code"}
+{"id":"seed-code-02","text":"I need a Python decorator that retries a function 3 times with exponential backoff. include jitter","difficulty":0.58,"domain":"code"}
+{"id":"seed-code-03","text":"why is my goroutine leaking here? ```go\nfor _, u := range urls {\n  go fetch(u, results)\n}\n``` results is unbuffered and I only read 5 of them","difficulty":0.68,"domain":"code"}
+{"id":"seed-code-04","text":"this query does a full table scan, how do I index it? SELECT * FROM events WHERE user_id = ? AND created_at > ? ORDER BY created_at DESC LIMIT 50","difficulty":0.6,"domain":"code"}
+{"id":"seed-code-05","text":"convert this callback pyramid to async/await and handle the error path properly: getUser(id, (err, u) => { getOrders(u, (err2, o) => { render(u, o) }) })","difficulty":0.55,"domain":"code"}
+{"id":"seed-math-01","text":"a recipe for 6 people uses 450g flour; scale it to 10 people and round sensibly","difficulty":0.35,"domain":"math"}
+{"id":"seed-math-02","text":"if I save 380 a month at 3.2% compounded monthly, what do I have after 5 years? show the formula","difficulty":0.62,"domain":"math"}
+{"id":"seed-math-03","text":"what's the expected number of rolls of a fair die until the first six? derive it, don't just state it","difficulty":0.75,"domain":"math"}
+{"id":"seed-math-04","text":"show that the sum of the first n odd numbers is n squared","difficulty":0.72,"domain":"math"}
+{"id":"seed-math-05","text":"two dice: what's the probability the sum is 9 given at least one die shows 5? careful with the conditioning","difficulty":0.78,"domain":"math"}
+{"id":"seed-reason-01","text":"our p99 latency doubled but p50 is flat, cpu is flat, and it only happens at the top of each hour. reason through the likeliest causes in order","difficulty":0.82,"domain":"reasoning"}
+{"id":"seed-reason-02","text":"sketch an approach for deduplicating 2 billion URLs with 16GB of RAM. compare bloom filter vs external sort","difficulty":0.85,"domain":"reasoning"}
+{"id":"seed-reason-03","text":"three switches downstairs, one bulb upstairs, one trip allowed. how do you find which switch controls the bulb, and what principle makes it work?","difficulty":0.7,"domain":"reasoning"}
+{"id":"seed-reason-04","text":"argue both sides: should a small team adopt a monorepo? end with a recommendation for a 6-person startup","difficulty":0.66,"domain":"reasoning"}
+{"id":"seed-reason-05","text":"why can't you compress arbitrary data losslessly below its entropy? explain with a counting argument","difficulty":0.88,"domain":"reasoning"}
+{"id":"seed-hard-short-01","text":"prove the pigeonhole principle","difficulty":0.74,"domain":"math"}
+{"id":"seed-hard-short-02","text":"why is comparison sort bounded by n log n?","difficulty":0.8,"domain":"reasoning"}
+{"id":"seed-hard-short-03","text":"derive the quadratic formula from completing the square","difficulty":0.7,"domain":"math"}
+{"id":"seed-easy-long-01","text":"here's my packing list, just confirm you got it: passport, chargers, the blue adapter, running shoes, rain jacket, the gift for Tomas, noise-canceling headphones, melatonin, two books I won't read, sunscreen, the good camera, spare SD cards, and the airport lounge pass. reply 'got it'","difficulty":0.1,"domain":"chitchat"}
+{"id":"seed-easy-long-02","text":"I'm listing everything wrong with my week and you just say 'noted'. the printer jammed twice, my badge stopped working, the vending machine ate my coins, the AC is set to arctic, my favorite mug walked off, the parking garage repainted my spot as EV-only, and the elevator music is somehow louder now. noted?","difficulty":0.1,"domain":"chitchat"}

@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -23,7 +24,25 @@ import (
 	"github.com/llmrelay/relay/internal/provider/openaicompat"
 	"github.com/llmrelay/relay/internal/provider/openaiprov"
 	"github.com/llmrelay/relay/internal/router"
+	"github.com/llmrelay/relay/internal/smart"
 )
+
+// embSinkKey carries a per-request slot for the tier-2 query embedding
+// (log_prompts: embeddings stores the vector, never the text).
+type embSinkKey struct{}
+
+// withEmbeddingSink arms a request context to capture the query vector.
+func withEmbeddingSink(ctx context.Context, slot *[]float32) context.Context {
+	return context.WithValue(ctx, embSinkKey{}, slot)
+}
+
+// recordDecisionVector is the router.Smart OnDecision hook: it hands the
+// tier-2 embedding to the armed request context, if any.
+func recordDecisionVector(ctx context.Context, d smart.Decision) {
+	if slot, ok := ctx.Value(embSinkKey{}).(*[]float32); ok && slot != nil && d.Vector != nil {
+		*slot = d.Vector
+	}
+}
 
 // Runtime is one immutable snapshot of config-derived state. Hot reload
 // builds a new Runtime and swaps the pointer; in-flight requests keep the
@@ -113,29 +132,43 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		Catalog:         rt.catalog.ByModel,
 		DefaultProvider: cfg.Routing.DefaultProvider,
 	}
-	if len(cfg.Routing.Aliases) == 0 {
-		rt.Router = static
-		return rt, nil
+
+	var table map[string]router.Router
+	if len(cfg.Routing.Aliases) > 0 {
+		specs := make(map[string]router.AliasSpec, len(cfg.Routing.Aliases))
+		for name, a := range cfg.Routing.Aliases {
+			spec := router.AliasSpec{Policy: a.Policy, Targets: a.Candidates}
+			for _, ch := range a.Children {
+				spec.Targets = append(spec.Targets, ch.Target)
+				spec.Weights = append(spec.Weights, ch.Weight)
+			}
+			specs[name] = spec
+		}
+		// Stats land later; until then fastest degrades to exploration
+		// order, stated in its reasons.
+		var err error
+		table, err = router.CompileAliases(specs, rt.priceFor, nil)
+		if err != nil {
+			return nil, fmt.Errorf("routing.aliases: %w", err)
+		}
 	}
 
-	specs := make(map[string]router.AliasSpec, len(cfg.Routing.Aliases))
-	for name, a := range cfg.Routing.Aliases {
-		spec := router.AliasSpec{Policy: a.Policy, Targets: a.Candidates}
-		for _, ch := range a.Children {
-			spec.Targets = append(spec.Targets, ch.Target)
-			spec.Weights = append(spec.Weights, ch.Weight)
+	var inner router.Router = static
+	if cfg.Routing.Default == "smart" {
+		sm, err := buildSmartRouter(cfg, providers, table)
+		if err != nil {
+			return nil, err
 		}
-		specs[name] = spec
+		inner = &router.StaticThenSmart{Static: static, Smart: sm}
 	}
-	// Stats land later in phase 3; until then fastest degrades to
-	// exploration order, stated in its reasons.
-	table, err := router.CompileAliases(specs, rt.priceFor, nil)
-	if err != nil {
-		return nil, fmt.Errorf("routing.aliases: %w", err)
+
+	if table == nil {
+		rt.Router = inner
+		return rt, nil
 	}
 	rt.Router = &router.Aliases{
 		Table: table,
-		Inner: static,
+		Inner: inner,
 		Filter: &router.Eligibility{Caps: func(providerName, model string) provider.Capabilities {
 			if mc, ok := providers[providerName].(provider.ModelCapabilities); ok {
 				return mc.Capabilities(model)
@@ -144,6 +177,98 @@ func BuildRuntime(cfg *config.Config) (*Runtime, error) {
 		}},
 	}
 	return rt, nil
+}
+
+// buildSmartRouter assembles the smart policy per DESIGN §0.3: tier 1
+// (lexical) always available; tier 2 (KNN) opt-in, bound to relay's own
+// provider embedding path, its reference set loaded from disk or built
+// from the embedded seed texts in the background.
+func buildSmartRouter(cfg *config.Config, providers map[string]provider.Provider, table map[string]router.Router) (*router.Smart, error) {
+	lex, err := smart.NewLexical()
+	if err != nil {
+		return nil, err
+	}
+	var classifier smart.Classifier = lex
+
+	// The default tier is a §0.3 launch-gate decision: it may only be
+	// "lexical" if relay eval proved tier 1 beats static on cost at equal
+	// quality. GATE-PENDING: resolved by the phase-4 eval run.
+	tier := cfg.Routing.Smart.Tier
+	if tier == "" {
+		tier = "lexical"
+	}
+	if tier == "knn" {
+		provName, model, _ := strings.Cut(cfg.Routing.Smart.Embeddings, "/")
+		p, ok := providers[provName]
+		if !ok {
+			return nil, fmt.Errorf("routing.smart.embeddings: unknown provider %q", provName)
+		}
+		emb, ok := p.(provider.Embedder)
+		if !ok {
+			return nil, fmt.Errorf("routing.smart.embeddings: provider %q has no embeddings API", provName)
+		}
+		embedFn := func(ctx context.Context, texts []string) ([][]float32, error) {
+			resp, err := emb.Embed(ctx, &provider.EmbedRequest{Model: model, Input: texts})
+			if err != nil {
+				return nil, err
+			}
+			return resp.Vectors, nil
+		}
+		knn := smart.NewKNN(embedFn, nil, lex)
+		refsPath := cfg.Routing.Smart.Reference
+		if refsPath == "" {
+			refsPath = config.DefaultSmartRefsPath()
+		}
+		// Background build: until the reference set is ready the KNN
+		// classifier reports lexical-fallback decisions with the reason.
+		go initKNNRefs(knn, embedFn, refsPath, cfg.Routing.Smart.Embeddings)
+		classifier = knn
+	}
+
+	easy, err := router.Chain(cfg.Routing.Smart.Easy, table)
+	if err != nil {
+		return nil, fmt.Errorf("routing.smart.easy: %w", err)
+	}
+	hard, err := router.Chain(cfg.Routing.Smart.Hard, table)
+	if err != nil {
+		return nil, fmt.Errorf("routing.smart.hard: %w", err)
+	}
+	return &router.Smart{Classifier: classifier, Easy: easy, Hard: hard, OnDecision: recordDecisionVector}, nil
+}
+
+// initKNNRefs loads the persisted reference set when it matches the
+// configured embedder, otherwise embeds the seed texts and persists.
+func initKNNRefs(knn *smart.KNN, embed smart.EmbedFunc, path, embedderID string) {
+	if st, err := smart.LoadRefStore(path); err == nil && st.Embedder == embedderID {
+		knn.SetRefs(st.Refs)
+		log.Printf("smart: tier-2 reference set loaded from %s (%d refs, embedder %s)", path, len(st.Refs), embedderID)
+		return
+	}
+	refs, err := smart.SeedRefs()
+	if err != nil {
+		log.Printf("smart: seed reference set unavailable: %v (tier 2 will fall back to lexical)", err)
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	texts := make([]string, len(refs))
+	for i, r := range refs {
+		texts[i] = r.Text
+	}
+	vecs, err := embed(ctx, texts)
+	if err != nil || len(vecs) != len(refs) {
+		log.Printf("smart: embedding seed reference set failed: %v (tier 2 will fall back to lexical until relay train succeeds)", err)
+		return
+	}
+	for i := range refs {
+		refs[i].Vector = vecs[i]
+	}
+	knn.SetRefs(refs)
+	if err := smart.SaveRefStore(path, &smart.RefStore{Embedder: embedderID, Refs: refs}); err != nil {
+		log.Printf("smart: persisting reference set: %v", err)
+	} else {
+		log.Printf("smart: tier-2 reference set built from %d seed texts and saved to %s", len(refs), path)
+	}
 }
 
 // kindsFor lists every alias pricing may know a provider by: its config

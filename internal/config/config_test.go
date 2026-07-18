@@ -59,10 +59,6 @@ func TestReservedFieldsWarnNotError(t *testing.T) {
 	cfg, err := Load(writeConfig(t, `
 providers:
   openai: {}
-routing:
-  default: smart
-  smart:
-    easy: cheap
 cache: { enabled: true, ttl: 10m }
 translate: { strictness: strict }
 logging: { retain: 90d }
@@ -70,7 +66,7 @@ logging: { retain: 90d }
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, field := range []string{"routing.default", "routing.smart", "translate.strictness", "logging.retain"} {
+	for _, field := range []string{"translate.strictness", "logging.retain"} {
 		found := false
 		for _, w := range cfg.Warnings {
 			if strings.Contains(w, field) {
@@ -86,6 +82,90 @@ logging: { retain: 90d }
 	}
 	if got := cfg.Logging.Retain.Std(); got != 90*24*time.Hour {
 		t.Fatalf("retain 90d parsed as %v", got)
+	}
+}
+
+func TestSmartRoutingConfig(t *testing.T) {
+	// Valid: chains reference an alias and a provider/model; local embedder.
+	cfg, err := Load(writeConfig(t, `
+providers:
+  openai: {}
+  ollama: {}
+routing:
+  default: smart
+  aliases:
+    cheap: [ollama/llama3.2]
+  smart:
+    easy: cheap
+    hard: openai/gpt-5
+    embeddings: ollama/nomic-embed-text
+    tier: knn
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Routing.Smart.Tier != "knn" {
+		t.Fatalf("smart config: %+v", cfg.Routing.Smart)
+	}
+
+	// Remote embedder without the explicit opt-in is refused.
+	_, err = Load(writeConfig(t, `
+providers:
+  openai: {}
+routing:
+  default: smart
+  smart: { easy: openai/gpt-4o-mini, hard: openai/gpt-5, embeddings: openai/text-embedding-3-small, tier: knn }
+`))
+	if err == nil || !strings.Contains(err.Error(), "allow_remote_embeddings") {
+		t.Fatalf("remote embedder must require opt-in, got %v", err)
+	}
+
+	// With the opt-in it loads, but warns.
+	cfg, err = Load(writeConfig(t, `
+providers:
+  openai: {}
+routing:
+  default: smart
+  smart:
+    easy: openai/gpt-4o-mini
+    hard: openai/gpt-5
+    embeddings: openai/text-embedding-3-small
+    allow_remote_embeddings: true
+    tier: knn
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	warned := false
+	for _, w := range cfg.Warnings {
+		if strings.Contains(w, "prompts will be sent to remote provider") {
+			warned = true
+		}
+	}
+	if !warned {
+		t.Fatalf("remote embedder opt-in must still warn: %v", cfg.Warnings)
+	}
+
+	// Broken smart configs are rejected.
+	for name, content := range map[string]string{
+		"missing chains":   "providers:\n  openai: {}\nrouting:\n  default: smart\n",
+		"bad tier":         "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: quantum}\n",
+		"knn no embedder":  "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: knn}\n",
+		"bad chain target": "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: nowhere/x, hard: openai/b}\n",
+		"bad default":      "providers:\n  openai: {}\nrouting:\n  default: smartest\n",
+	} {
+		if _, err := Load(writeConfig(t, content)); err == nil {
+			t.Errorf("%s: want error, got nil", name)
+		}
+	}
+
+	// log_prompts: embeddings without an embedding source downgrades to off.
+	cfg, err = Load(writeConfig(t, "providers:\n  openai: {}\nlogging: { log_prompts: embeddings }\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Logging.LogPrompts != "off" {
+		t.Fatalf("log_prompts should downgrade to off, got %q", cfg.Logging.LogPrompts)
 	}
 }
 

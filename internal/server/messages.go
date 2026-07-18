@@ -44,7 +44,9 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	rt := s.Runtime()
 	start := time.Now()
 	rec := store.Record{ID: ids.New("req"), TS: start, API: "anthropic"}
+	var promptVec []float32 // tier-2 query embedding, under log_prompts: embeddings
 	defer func() {
+		rec.PromptEmbedding = promptVec
 		rec.LatencyMS = time.Since(start).Milliseconds()
 		if rec.Cached {
 			zero := 0.0
@@ -96,6 +98,9 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(r.Context(), rt.requestTimeout(ir.Stream))
 	defer cancel()
+	if rt.Config.Logging.LogPrompts == "embeddings" {
+		ctx = withEmbeddingSink(ctx, &promptVec)
+	}
 
 	rec.RoutePolicy = rt.Router.Name()
 	candidates, err := rt.Router.Route(ctx, ir)

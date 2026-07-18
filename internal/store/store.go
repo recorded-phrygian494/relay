@@ -5,7 +5,9 @@ package store
 
 import (
 	"database/sql"
+	"encoding/binary"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"sync"
@@ -69,8 +71,11 @@ type Record struct {
 	Stream         bool
 	Cached         bool
 	PromptHash     string
-	PromptBody     string
-	ResponseBody   string
+	// PromptEmbedding is the query vector under log_prompts: embeddings —
+	// the training-value tier that never stores raw text (DESIGN §8).
+	PromptEmbedding []float32
+	PromptBody      string
+	ResponseBody    string
 }
 
 // Store owns the database and the async writer.
@@ -139,14 +144,39 @@ func (s *Store) insert(r Record) error {
 		(id, ts, api, model_requested, model_served, provider, route_policy,
 		 route_reason, attempts, status, error_code, tokens_in, tokens_out,
 		 cost_usd, latency_ms, ttft_ms, stream, cached, prompt_hash,
-		 prompt_body, response_body)
-		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		 prompt_embedding, prompt_body, response_body)
+		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 		r.ID, r.TS.UnixMilli(), r.API, r.ModelRequested, r.ModelServed,
 		r.Provider, r.RoutePolicy, r.RouteReason, r.Attempts, r.Status,
 		r.ErrorCode, r.TokensIn, r.TokensOut, r.CostUSD, r.LatencyMS,
 		r.TTFTMS, boolInt(r.Stream), boolInt(r.Cached), r.PromptHash,
-		nullable(r.PromptBody), nullable(r.ResponseBody))
+		EncodeVector(r.PromptEmbedding), nullable(r.PromptBody), nullable(r.ResponseBody))
 	return err
+}
+
+// EncodeVector packs a float32 vector as little-endian bytes for the
+// prompt_embedding BLOB (DESIGN §9); nil in, nil (SQL NULL) out.
+func EncodeVector(v []float32) []byte {
+	if len(v) == 0 {
+		return nil
+	}
+	out := make([]byte, 4*len(v))
+	for i, f := range v {
+		binary.LittleEndian.PutUint32(out[4*i:], math.Float32bits(f))
+	}
+	return out
+}
+
+// DecodeVector unpacks a prompt_embedding BLOB.
+func DecodeVector(b []byte) []float32 {
+	if len(b) < 4 {
+		return nil
+	}
+	out := make([]float32, len(b)/4)
+	for i := range out {
+		out[i] = math.Float32frombits(binary.LittleEndian.Uint32(b[4*i:]))
+	}
+	return out
 }
 
 func boolInt(b bool) int {
@@ -190,6 +220,21 @@ func (s *Store) Close() error {
 	close(s.done)
 	s.wg.Wait()
 	return s.db.Close()
+}
+
+// SetFeedback records an explicit quality score for a logged request
+// (POST /v1/feedback, DESIGN §0.4). Returns false when no such request
+// id exists. Synchronous: feedback is rare and callers want the 404.
+func (s *Store) SetFeedback(requestID string, score float64) (bool, error) {
+	if s.closed.Load() {
+		return false, fmt.Errorf("store is closed")
+	}
+	res, err := s.db.Exec(`UPDATE requests SET feedback_score = ? WHERE id = ?`, score, requestID)
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n > 0, err
 }
 
 // DB exposes the underlying handle for read-only stats queries.
