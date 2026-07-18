@@ -77,6 +77,7 @@ type Record struct {
 type Store struct {
 	db      *sql.DB
 	ch      chan Record
+	done    chan struct{} // closed by Close; ch itself is never closed
 	wg      sync.WaitGroup
 	dropped atomic.Int64
 	closed  atomic.Bool
@@ -99,7 +100,7 @@ func Open(path string) (*Store, error) {
 		db.Close()
 		return nil, fmt.Errorf("applying schema: %w", err)
 	}
-	s := &Store{db: db, ch: make(chan Record, 1024)}
+	s := &Store{db: db, ch: make(chan Record, 1024), done: make(chan struct{})}
 	s.wg.Add(1)
 	go s.writer()
 	return s, nil
@@ -107,10 +108,28 @@ func Open(path string) (*Store, error) {
 
 func (s *Store) writer() {
 	defer s.wg.Done()
-	for r := range s.ch {
+	write := func(r Record) {
 		if err := s.insert(r); err != nil {
 			// Logging must never take down serving; count and continue.
 			s.dropped.Add(1)
+		}
+	}
+	for {
+		select {
+		case r := <-s.ch:
+			write(r)
+		case <-s.done:
+			// Drain what is buffered, then exit. A Log that raced past the
+			// closed check during shutdown may miss this drain; that record
+			// is best-effort by design.
+			for {
+				select {
+				case r := <-s.ch:
+					write(r)
+				default:
+					return
+				}
+			}
 		}
 	}
 }
@@ -160,12 +179,15 @@ func (s *Store) Log(r Record) {
 // Dropped reports how many records were lost to backpressure or errors.
 func (s *Store) Dropped() int64 { return s.dropped.Load() }
 
-// Close drains the queue and closes the database.
+// Close drains the queue and closes the database. The record channel is
+// never closed: a request goroutine that raced past Log's closed check
+// must be able to complete its send without panicking (-race gate finding,
+// 2026-07-18).
 func (s *Store) Close() error {
 	if s.closed.Swap(true) {
 		return nil
 	}
-	close(s.ch)
+	close(s.done)
 	s.wg.Wait()
 	return s.db.Close()
 }
