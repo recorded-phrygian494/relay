@@ -93,6 +93,23 @@ type Embedder interface {
 	Embed(ctx context.Context, req *EmbedRequest) (*EmbedResponse, error)
 }
 
+// Onboarding is where a human gets a key for a first-party provider —
+// consumed by relay init so the CLI hardcodes nothing.
+type Onboarding struct {
+	EnvKey     string
+	ConsoleURL string
+	Notes      string
+}
+
+// FirstPartyOnboarding covers the natively-dialected providers; the
+// OpenAI-compatible presets carry their own onboarding in their profiles.
+var FirstPartyOnboarding = map[string]Onboarding{
+	"openai":    {EnvKey: "OPENAI_API_KEY", ConsoleURL: "https://platform.openai.com/api-keys"},
+	"anthropic": {EnvKey: "ANTHROPIC_API_KEY", ConsoleURL: "https://console.anthropic.com/settings/keys"},
+	"gemini":    {EnvKey: "GEMINI_API_KEY", ConsoleURL: "https://aistudio.google.com/apikey", Notes: "free tier has per-model daily quotas; Vertex AI is a different auth scheme (not this key)"},
+	"ollama":    {Notes: "no key — install from https://ollama.com and `ollama pull` a model; relay auto-discovers it"},
+}
+
 // Error is a normalized upstream failure. Raw preserves the provider's
 // original error body for debugging.
 type Error struct {

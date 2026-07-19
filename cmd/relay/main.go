@@ -12,10 +12,13 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/llmrelay/relay/internal/config"
 	"github.com/llmrelay/relay/internal/pricing"
+	"github.com/llmrelay/relay/internal/provider"
+	"github.com/llmrelay/relay/internal/provider/openaicompat"
 	"github.com/llmrelay/relay/internal/server"
 	"github.com/llmrelay/relay/internal/store"
 )
@@ -30,6 +33,7 @@ Usage:
   relay stats             traffic summary from the local request log
   relay eval              routing eval harness: smart vs static on cost + quality (§0.3)
   relay train             build/update the smart-routing reference set from your own logs
+  relay compare           fan one prompt to N models: output, cost, latency, TTFT side by side
   relay pricing update    refresh the pricing registry (explicit only, never automatic)
   relay pricing show      print the active pricing registry source
   relay version           print the version
@@ -59,6 +63,8 @@ func main() {
 		err = runEval(args)
 	case "train":
 		err = runTrain(args)
+	case "compare":
+		err = runCompare(args)
 	case "pricing":
 		err = runPricing(args)
 	case "version":
@@ -210,7 +216,47 @@ func runInit(args []string) error {
 		return err
 	}
 	fmt.Println("wrote relay.yaml — set your API keys as environment variables and run: relay serve")
+	fmt.Println("\nwhere the keys come from:")
+	printOnboarding()
 	return nil
+}
+
+// printOnboarding renders per-provider key onboarding from the provider
+// metadata (first-party map + compat preset profiles) — data lives with
+// the providers, never hardcoded here.
+func printOnboarding() {
+	var names []string
+	for name := range provider.FirstPartyOnboarding {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		o := provider.FirstPartyOnboarding[name]
+		line := fmt.Sprintf("  %-11s", name)
+		if o.EnvKey != "" {
+			line += fmt.Sprintf(" %-22s", o.EnvKey)
+		} else {
+			line += fmt.Sprintf(" %-22s", "(no key)")
+		}
+		line += " " + o.ConsoleURL
+		fmt.Println(line)
+		if o.Notes != "" {
+			fmt.Printf("  %-11s   note: %s\n", "", o.Notes)
+		}
+	}
+	names = names[:0]
+	for name := range openaicompat.Profiles {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		p := openaicompat.Profiles[name]
+		fmt.Printf("  %-11s %-22s %s\n", name, p.EnvKey, p.ConsoleURL)
+		if p.Notes != "" {
+			fmt.Printf("  %-11s   note: %s\n", "", p.Notes)
+		}
+	}
+	fmt.Println("\npresets: use `profile: <name>` in relay.yaml (or just name the provider after the preset).")
 }
 
 // pricingURL is the project's published registry; fetched only on explicit
