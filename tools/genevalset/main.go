@@ -1,24 +1,26 @@
-// genevalset deterministically generates the committed routing eval set
-// (assets/eval/evalset_v1.jsonl). Synthetic by construction — provenance
-// and limits are documented in assets/eval/README.md. Regenerating with
-// the same seed reproduces the file byte-for-byte:
+// genevalset deterministically generates the committed routing eval sets.
+// Synthetic by construction — provenance and limits are documented in
+// assets/eval/README.md. Regenerating with the same version reproduces
+// the file byte-for-byte:
 //
 //	go run ./tools/genevalset > assets/eval/evalset_v1.jsonl
+//	go run ./tools/genevalset -version v2 > assets/eval/evalset_v2.jsonl
+//
+// v2 exists as the held-out set for the honest §0.3 gate re-run: new
+// prompt texts (disjoint from v1 and from tier-2's seed refs), same
+// family coverage, new seed. Tier-1 weights must never be calibrated
+// against it.
 package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"math"
 	"math/rand"
 	"os"
 
 	"github.com/llmrelay/relay/internal/evalx"
-)
-
-const (
-	version = "v1"
-	seed    = 1
 )
 
 type tmpl struct {
@@ -29,7 +31,8 @@ type tmpl struct {
 	prompts    []string
 }
 
-var banks = []tmpl{
+// banksV1 is the original set (calibration set for tier-1 weights).
+var banksV1 = []tmpl{
 	{"chitchat", "chitchat", [2]float64{0.05, 0.20}, [2]int{20, 80}, []string{
 		"hey! how's it going?",
 		"good morning! any fun plans for the weekend?",
@@ -101,6 +104,81 @@ var banks = []tmpl{
 	}},
 }
 
+// banksV2 is the held-out set for the honest gate re-run: same family
+// coverage, all-new texts, disjoint from banksV1 and from
+// internal/smart/seed_refs.jsonl.
+var banksV2 = []tmpl{
+	{"chitchat", "chitchat", [2]float64{0.05, 0.20}, [2]int{20, 80}, []string{
+		"yo! long time. how've you been?",
+		"happy friday!! we survived another week",
+		"can you make this sound more excited: 'The event is tomorrow.'",
+		"just got back from a run, feeling great. anyway hi",
+		"write a two-line thank-you note for my neighbor who watered my plants",
+		"what's a fun fact I can open a team meeting with?",
+		"my dog learned to open the fridge. send help lol",
+		"night! talk tomorrow",
+	}},
+	{"qa", "simple-qa", [2]float64{0.12, 0.32}, [2]int{30, 120}, []string{
+		"What's the largest planet in the solar system?",
+		"How many teaspoons are in a tablespoon?",
+		"Who composed The Four Seasons?",
+		"Which country spans the most time zones?",
+		"What's the difference between espresso and drip coffee?",
+		"What does DNS stand for, and what does it do in one sentence?",
+		"Roughly how far is the Moon from Earth?",
+		"At what temperature does water freeze in Fahrenheit?",
+	}},
+	{"extraction", "extraction", [2]float64{0.20, 0.42}, [2]int{60, 160}, []string{
+		"Get the order numbers from this note as a JSON array: 'Refund ORD-9912 and ORD-8830; ORD-7714 already shipped.'",
+		"Return {\"person\":..., \"company\":..., \"role\":...} from: 'Keisha Alade joined Vantor as Head of Data in May.'",
+		"List every URL in this text, one per line: 'See https://a.example/docs and http://b.example/faq; the old wiki (wiki.example.org) is retired.'",
+		"From this log line, give me severity and service as JSON: 'ERROR payments-api: card vault timeout after 3 retries'",
+		"Extract all the prices mentioned, comma-separated: 'Basic is $9.99, pro is $24, and enterprise starts at $199 per seat.'",
+		"Turn this RSVP list into JSON [{name, attending}]: 'Ana yes, Bo no, Chen maybe, Dee yes'",
+	}},
+	{"summarize", "summarize", [2]float64{0.30, 0.55}, [2]int{80, 220}, []string{
+		"Summarize in one sentence: \"After a six-month trial, the library board voted to make Sunday hours permanent at the main branch, funded by reallocating the print-periodicals budget. Two branch libraries will pilot the same schedule next quarter, with a usage review scheduled before any further expansion.\"",
+		"Give me the gist of this release note in two bullets: \"Version 4.1 introduces workspace-level API tokens and an audit export in CSV and JSON. The legacy per-user tokens keep working until January, after which they are read-only. Rate limits are now enforced per workspace rather than per token, which may affect high-volume integrations.\"",
+		"Condense this email to its two decisions: \"Hi all — after Thursday's postmortem we agreed on the following. We will split the monolith deploy into two independently releasable services, starting with billing, targeted for the end of next sprint. We also decided against adopting the new feature-flag vendor for now; the migration cost outweighs the benefit while the current system is stable. Everything else from the discussion is captured as backlog items.\"",
+		"TL;DR this abstract: \"We investigate whether smaller instruction-tuned models can substitute for frontier models in structured-extraction tasks. On five datasets, a 8B model with schema-constrained decoding recovers 96 percent of frontier accuracy at 4 percent of the cost, but degrades sharply when field definitions are ambiguous or nested beyond two levels.\"",
+	}},
+	{"code", "code-write", [2]float64{0.45, 0.72}, [2]int{150, 500}, []string{
+		"Write a Python function that returns the longest common prefix of a list of strings, with type hints and doctests.",
+		"Write Go HTTP middleware that logs method, path, status code, and duration for each request.",
+		"Implement groupBy<T> in TypeScript with proper generics for the key selector and return type.",
+		"Write a SQL query returning each customer's second-most-recent order from orders(id, customer_id, created_at). Explain the approach in one sentence.",
+		"Write a short bash script that prints the 10 largest files under a directory with human-readable sizes.",
+	}},
+	{"code", "code-debug", [2]float64{0.55, 0.80}, [2]int{150, 450}, []string{
+		"Why does this Python function accumulate values across calls? def add(item, items=[]):\n    items.append(item)\n    return items\nFix it and explain.",
+		"This Go loop launches goroutines that all see the same value and race on the slice:\n```go\nfor i := 0; i < n; i++ {\n  go func() { results = append(results, work(i)) }()\n}\n```\nName both bugs and fix them.",
+		"React: my websocket handler leaks on re-mount. useEffect(() => { socket.on('msg', handle) }, []) — what's missing and why does dev mode surface it twice?",
+		"Postgres ignores my index on email for WHERE lower(email) = 'x@y.com'. Why, and what are two different fixes?",
+	}},
+	{"math", "math-word", [2]float64{0.60, 0.88}, [2]int{150, 400}, []string{
+		"A pool fills through pipe A in 6 hours, through pipe B in 9 hours, and drains through the outlet in 18 hours. With all three open and the pool empty, how long until it's full? Show steps.",
+		"You roll two dice: if the sum is even you win that many dollars, if odd you lose $4. What's the expected value per roll? Give an exact fraction.",
+		"A $12,000 loan at 6% annual interest compounded monthly, paying $400 per month — how many months until it's paid off? Show the formula you use.",
+		"Three friends split a bill in the ratio 2:3:4. The largest share is $18 more than the smallest. What was the total? Work it through.",
+	}},
+	{"reasoning", "multi-step", [2]float64{0.68, 0.95}, [2]int{200, 600}, []string{
+		"Four colleagues presented in different slots (9, 10, 11, 12). Jae presented before Kim. Kim did not present at 10. Lena presented immediately after Jae. Marco presented last. Who presented when? Show the deduction chain.",
+		"Design the caching and invalidation strategy for user permissions in a system with role inheritance and per-object grants. Compare two designs and recommend one with justification.",
+		"You have 12 coins and one counterfeit that is heavier or lighter, unknown which. Using a balance scale three times, outline a strategy that always identifies the counterfeit, and explain the information-theoretic reason three weighings suffice.",
+		"Our error budget burned 40% in one day, only in one region; p50 there is normal but p99 tripled. Order your investigation steps by expected information gain and justify the ordering.",
+	}},
+	{"math", "short-hard", [2]float64{0.72, 0.95}, [2]int{200, 500}, []string{
+		"Prove that the square root of 3 is irrational.",
+		"Show that the harmonic series diverges.",
+		"Why are the real numbers uncountable? Sketch Cantor's diagonal argument.",
+		"Prove that a tree with n vertices has exactly n-1 edges.",
+	}},
+	{"chitchat", "long-easy", [2]float64{0.08, 0.22}, [2]int{20, 60}, []string{
+		"posting my grocery list here so it's on my phone, just say 'got it': oat milk, eggs, the good sourdough from the corner place, basil (fresh not dried), parmesan, arborio rice, that hot honey everyone keeps talking about, lemons, sparkling water, dark chocolate for baking, coffee beans (medium roast), paper towels, dish soap refill, and batteries AA and AAA both because the remote and the scale died the same week.",
+		"ok recap of my day, you just say 'that sounds like a lot': started with a 7am call that should never have been scheduled, then the build broke because of a dependency nobody remembers adding, lunch got cancelled, the afternoon was three back-to-back reviews where everyone agreed to disagree, my headphones died mid-focus-block, and the train home sat in a tunnel for twenty minutes. anyway. that's it. that's the day.",
+	}},
+}
+
 // quality maps (band, difficulty, domain) to a synthetic quality label.
 // The model: all bands share one base and diverge with difficulty — band
 // gaps vanish as difficulty approaches zero (on trivial traffic every
@@ -127,6 +205,20 @@ func quality(band evalx.Band, difficulty float64, domain string, jitter float64)
 }
 
 func main() {
+	versionFlag := flag.String("version", "v1", "eval set version to generate (v1 | v2)")
+	flag.Parse()
+	var banks []tmpl
+	var seed int64
+	switch *versionFlag {
+	case "v1":
+		banks, seed = banksV1, 1
+	case "v2":
+		banks, seed = banksV2, 2
+	default:
+		fmt.Fprintf(os.Stderr, "unknown version %q (want v1 | v2)\n", *versionFlag)
+		os.Exit(2)
+	}
+	version := *versionFlag
 	rng := rand.New(rand.NewSource(seed))
 	out := json.NewEncoder(os.Stdout)
 	fmt.Printf("{\"version\":%q,\"seed\":%d}\n", version, seed)

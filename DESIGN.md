@@ -80,17 +80,29 @@ the documented smart tier (with the lexical tier available behind an explicit co
 flag, clearly labeled experimental). The Phase 4 eval report must state which side of
 this gate we landed on; Phase 5 README copy depends on it.
 
-**GATE OUTCOME (2026-07-18, eval set v1, tolerance 0.02):** `relay eval` compared
-static-frontier / static-mid / static-cheap / cheapest / tier-1 / tier-2 on the
-committed set. **Tier 1 passed** — mean quality 0.900 vs baseline 0.918 (−0.017,
-within tolerance) at −18% cost — and ships as the enabled default `smart` tier.
-Tier 2 with only the 37-text seed reference set missed the tolerance (−0.033 at
-−27% cost; two hard rows matched weak ≈0.5-similarity neighbors), which is the
-expected cold-start result: tier 2 is the *documented upgrade path once `relay
-train` densifies the reference set from real traffic*, not the cold-start
-default. Caveats: quality labels are synthetic and tier-1 weights were
-calibrated in-sample (assets/eval/README.md states both plainly); the verdict is
-"on this set under this quality model", re-run per release.
+**GATE OUTCOME v1 (2026-07-18, eval set v1, tolerance 0.02) — SUPERSEDED:**
+tier 1 "passed" (−18% cost, quality −0.017) — but tier-1 weights were
+calibrated on this same set, so the result was in-sample and is not valid
+evidence for default-on. Kept for the record; v1 is the calibration set.
+
+**GATE OUTCOME v2 (2026-07-19, held-out eval set v2, classifier frozen at
+d25490c, tolerance 0.02):** on out-of-sample data with synthetic labels, tier 1
+**failed** decisively (quality −0.071 at −45% cost — over-easy: 35/49 routed
+cheap, hard rows among them) and tier 2 from the cold-start seed refs
+near-missed (−0.022 at −21% cost). The definitive live-judged run (real
+completions, judge-scored) was attempted twice on 2026-07-19 and **could not
+complete**: the Anthropic account exhausted its credit balance mid-run and
+gemini-3.5-flash's free tier caps at 20 requests/day (49 needed). The harness
+now refuses to emit a table when >10% of pairs fail on infrastructure — a
+partial live run is not evidence. **Applied outcome (the conservative branch,
+per the gate's own rule that nothing routes by default without proof): smart
+routing ships off-by-default.** Enabling it requires an explicit
+`routing.default: smart` plus an explicit tier: `knn` is the documented tier
+(auto-selected when `routing.smart.embeddings` is set), `lexical` is available
+but labeled experimental. The README says exactly this, and points users at
+`relay eval` to beat the baseline on their own traffic before trusting any
+router. The live-judged v2 run remains the standard to (re)claim default-on;
+it needs funded provider accounts.
 
 ### 0.4 "Train from your own traffic" has a labeling problem — be honest about the loop
 

@@ -388,12 +388,23 @@ func extractUserText(rawBody string) string {
 }
 
 func completeText(ctx context.Context, p provider.Provider, model, prompt string) (string, error) {
-	resp, err := p.Complete(ctx, &core.Request{
+	text, _, err := completeTextN(ctx, p, model, prompt, 0)
+	return text, err
+}
+
+// completeTextN is completeText with a max-token cap and usage reporting
+// (the live-judged eval prices real usage).
+func completeTextN(ctx context.Context, p provider.Provider, model, prompt string, maxTokens int) (string, core.Usage, error) {
+	req := &core.Request{
 		Model:    model,
 		Messages: []core.Message{{Role: core.RoleUser, Parts: []core.Part{core.TextPart{Text: prompt}}}},
-	})
+	}
+	if maxTokens > 0 {
+		req.MaxTokens = &maxTokens
+	}
+	resp, err := p.Complete(ctx, req)
 	if err != nil {
-		return "", err
+		return "", core.Usage{}, err
 	}
 	var b strings.Builder
 	for _, part := range resp.Choices[0].Parts {
@@ -401,7 +412,7 @@ func completeText(ctx context.Context, p provider.Provider, model, prompt string
 			b.WriteString(tp.Text)
 		}
 	}
-	return b.String(), nil
+	return b.String(), resp.Usage, nil
 }
 
 func judgeScore(ctx context.Context, p provider.Provider, model, prompt, answer string) (float64, error) {

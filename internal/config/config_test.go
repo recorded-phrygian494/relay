@@ -146,17 +146,38 @@ routing:
 		t.Fatalf("remote embedder opt-in must still warn: %v", cfg.Warnings)
 	}
 
-	// Broken smart configs are rejected.
+	// Broken smart configs are rejected — including no explicit tier and
+	// no embedder: the §0.3 v2 gate outcome means nothing smart is a
+	// silent default.
 	for name, content := range map[string]string{
-		"missing chains":   "providers:\n  openai: {}\nrouting:\n  default: smart\n",
-		"bad tier":         "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: quantum}\n",
-		"knn no embedder":  "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: knn}\n",
-		"bad chain target": "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: nowhere/x, hard: openai/b}\n",
-		"bad default":      "providers:\n  openai: {}\nrouting:\n  default: smartest\n",
+		"missing chains":          "providers:\n  openai: {}\nrouting:\n  default: smart\n",
+		"bad tier":                "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: quantum}\n",
+		"knn no embedder":         "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b, tier: knn}\n",
+		"no tier and no embedder": "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: openai/a, hard: openai/b}\n",
+		"bad chain target":        "providers:\n  openai: {}\nrouting:\n  default: smart\n  smart: {easy: nowhere/x, hard: openai/b}\n",
+		"bad default":             "providers:\n  openai: {}\nrouting:\n  default: smartest\n",
 	} {
 		if _, err := Load(writeConfig(t, content)); err == nil {
 			t.Errorf("%s: want error, got nil", name)
 		}
+	}
+
+	// An embedder without an explicit tier auto-selects knn (the
+	// documented tier); lexical stays available only as an explicit,
+	// experimental choice.
+	cfg, err = Load(writeConfig(t, `
+providers:
+  openai: {}
+  ollama: {}
+routing:
+  default: smart
+  smart: { easy: openai/gpt-4o-mini, hard: openai/gpt-5, embeddings: ollama/nomic-embed-text }
+`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Routing.Smart.Tier != "knn" {
+		t.Fatalf("embeddings without tier should select knn, got %q", cfg.Routing.Smart.Tier)
 	}
 
 	// log_prompts: embeddings without an embedding source downgrades to off.

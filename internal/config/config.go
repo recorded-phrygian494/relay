@@ -447,7 +447,18 @@ func (c *Config) finalize() error {
 			}
 		}
 		switch s.Tier {
-		case "", "lexical":
+		case "":
+			// §0.3 launch-gate outcome (v2 re-run, 2026-07-19): no smart
+			// tier has proven cost-at-equal-quality on the held-out set,
+			// so nothing is silently on-by-default. KNN is the documented
+			// tier when an embedder is configured; otherwise the choice is
+			// explicit.
+			if s.Embeddings != "" {
+				s.Tier = "knn"
+			} else {
+				return fmt.Errorf("routing.smart.tier: choose explicitly — \"knn\" (documented tier, needs routing.smart.embeddings) or \"lexical\" (experimental: did not pass the launch gate on the held-out eval set; run `relay eval` on your own traffic first)")
+			}
+		case "lexical":
 		case "knn":
 			if s.Embeddings == "" {
 				return fmt.Errorf("routing.smart.tier: knn requires routing.smart.embeddings")
