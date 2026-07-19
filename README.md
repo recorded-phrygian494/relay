@@ -1,93 +1,171 @@
 # relay
 
-Self-hosted LLM gateway + model router. One static Go binary that speaks both the
-OpenAI and Anthropic API dialects inbound, routes across any provider outbound
-(bring your own keys), with pluggable routing policies. Zero telemetry — not even
-opt-in pings. Apache-2.0.
-
-> **Status:** pre-1.0, under active development (phase 4 of 5 complete: smart
-> routing, `relay eval` / `relay train`, plus routing policies, reliability,
-> pricing/cost, observability, embeddings, cache from earlier phases).
-> See [DESIGN.md](DESIGN.md) for the full design and roadmap.
-
-## Quick start
+Self-hosted LLM gateway + model router. One static Go binary that speaks both
+the **OpenAI and Anthropic API dialects inbound**, routes across any provider
+outbound (bring your own keys), with routing policies from static aliases to a
+learned smart tier — gated by an eval harness that ships in the box. Zero
+telemetry — not even opt-in pings. Apache-2.0.
 
 ```
-export GEMINI_API_KEY=...      # and/or OPENAI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY, ...
-relay serve                    # zero-config: sniffs env keys, probes local Ollama, listens on 127.0.0.1:4000
+any OpenAI SDK ─┐                                  ┌─ OpenAI / Anthropic / Gemini
+Claude Code ────┤→  relay (one binary, :4000)  →  ├─ Groq / DeepSeek / Mistral / xAI / …
+plain curl ─────┘   route · failover · log · cache └─ your local Ollama
 ```
 
-Point any OpenAI SDK at `http://localhost:4000/v1`, or Claude Code at
-`ANTHROPIC_BASE_URL=http://localhost:4000`. `relay init` scaffolds a `relay.yaml`
-for aliases, fallback/cheapest/fastest/weighted routing, key pools, and the cache
-(the full example lives in DESIGN.md §8 and always loads verbatim — CI enforces it).
+## 60-second quickstart
+
+```bash
+# 1. install (or: docker run ghcr.io/llmrelay/relay, or download a release binary)
+brew install llmrelay/tap/relay
+
+# 2. keys you already have, zero config
+export GEMINI_API_KEY=...        # and/or OPENAI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY, ...
+relay serve
+
+# 3. point anything at it
+curl http://localhost:4000/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"gemini/gemini-3.1-flash-lite","messages":[{"role":"user","content":"hello"}]}'
+export ANTHROPIC_BASE_URL=http://localhost:4000   # Claude Code now runs through relay
+```
+
+`relay init` scaffolds a full relay.yaml — including where to get every
+provider's key. See [examples/](examples/) for Claude Code, Cursor, SDK
+snippets, and the sensitive-local / bulk-cheap alias recipe.
+
+## Why relay (and honest alternatives)
+
+| | **relay** | LiteLLM | OpenRouter | RouteLLM |
+|---|---|---|---|---|
+| What it is | self-hosted gateway + router | Python proxy/SDK gateway | hosted aggregator API | research routing framework |
+| Deploy | one static binary / distroless image | Python service + deps | nothing (their cloud) | Python library |
+| Inbound dialects | OpenAI **and** Anthropic, full cross-translation | OpenAI (+ passthroughs) | OpenAI-compatible | n/a |
+| Learned routing | tiered, local, trained on **your** logs, eval-gated | manual routing strategies | their routing | the prior art¹ |
+| Eval harness in the box | yes (`relay eval`, committed sets, live-judge) | no | no | offline research harness |
+| Your prompts transit a third party | never (self-hosted; remote-embedder routing requires explicit opt-in) | self-hosted | yes — that's the product | n/a |
+| Telemetry | none, ever | none per their docs | hosted service | n/a |
+| Ecosystem breadth | 4 native + 12 presets, adapter guide | broadest provider matrix, teams/budgets/virtual keys | very broad | n/a |
+| License / runtime | Apache-2.0, Go | mixed (OSS + enterprise), Python | proprietary service | Apache-2.0, Python |
+
+¹ relay's tier-2 KNN is the same family as [RouteLLM](https://arxiv.org/abs/2406.18665)
+(Ong et al.), run locally over your own traffic; graph routers
+([GraphRouter](https://arxiv.org/abs/2410.03834), ICLR 2025) are roadmap.
+LiteLLM and OpenRouter are good products with different trade-offs — pick the
+row that matters to you.
 
 ## API compatibility
 
 | Inbound | Status |
 |---|---|
 | OpenAI Chat Completions (`/v1/chat/completions`) | full, incl. streaming, tools, vision |
-| OpenAI Responses API (`/v1/responses`) | **not yet** — fast-follow after v1 |
+| OpenAI Responses API (`/v1/responses`) | **not yet** — tracked v1.1 fast-follow |
 | Anthropic Messages (`/v1/messages`, `count_tokens`) | full, incl. streaming, tools |
 | Embeddings (`/v1/embeddings`) | OpenAI dialect; providers without an embeddings API answer an honest 404 |
-| `/v1/models`, `/metrics` (Prometheus), `/dashboard` | yes |
+| `/v1/models`, `/metrics` (Prometheus), `/dashboard`, `/v1/feedback` | yes |
 
 ## Performance
 
 Gateway overhead measured against a loopback mock upstream (`go test
--run TestOverheadBudget ./internal/server/`, p50 of 20×30-request batches,
-Windows 11 / Go 1.25, 2026-07-18):
+-run TestOverheadBudget ./internal/server/` — the budget is a hard CI gate,
+methodology in [DESIGN.md §11](DESIGN.md); Windows 11 / Go 1.25, 2026-07-18):
 
 | Metric | Budget (CI-gated) | Measured |
 |---|---|---|
 | Non-streaming p50 overhead | < 5 ms | **~0.18 ms** |
 | Added time-to-first-token p50 (streaming) | < 2 ms | **~0.63 ms** |
 
-The budget is a hard test in CI; the numbers above are what the suite printed on
-the dev machine. Provider latency dominates end-to-end time; relay's job is to
-stay invisible.
+Provider latency dominates end-to-end time; relay's job is to stay invisible.
 
-## Smart routing
+## Routing
 
-Smart routing **gets better on YOUR traffic via `relay train`** — the shipped
-router is a starting point, not a finished brain. `routing.default: smart`
-classifies each unaliased request's difficulty and routes easy traffic to your
-cheap chain and hard traffic to your frontier chain. Two tiers:
+Static routes and aliases with four policies (fallback / cheapest / fastest /
+weighted), plus reliability underneath every chain: retries with jittered
+backoff, API-key pools with rate-limit cooldowns, circuit breakers, and
+pre-first-token streaming failover.
 
-- **Tier 1 (default): pure-Go lexical classifier.** Deterministic, zero external
-  calls, and every decision logs its evidence
-  (`lexical: words=9 reason=1(prove) → difficulty 0.74 (hard, conf 0.91)`) into
-  the decisions log — "the model felt like it" is not an accepted routing reason.
-- **Tier 2 (opt-in): embedding KNN** over a reference set, using an embedding
-  model you already run (`routing.smart.embeddings: ollama/nomic-embed-text`).
-  Local-only by default: a remote embedder requires an explicit
-  `allow_remote_embeddings: true`, because routing must never silently ship your
-  prompts to an API. `relay train` grows the reference set from your own logs
-  (implicit signals, optional replay+judge — which always prints its projected
-  spend and asks before spending — and `POST /v1/feedback` scores).
+### Smart routing — off by default, and that's the feature
 
-**What the eval gate showed (and its limits):** on the committed synthetic eval
-set (v1, 49 queries — see `assets/eval/README.md` for provenance and the stated
-circularity caveats), `relay eval` measured tier 1 at −18% cost within 0.017
-mean quality of always-frontier (tolerance 0.02) — that result is why tier 1
-ships enabled. Tier 2 from the cold-start seed set alone was cheaper (−27%) but
-missed the quality bar (−0.033); it is the upgrade path *after* `relay train`
-has densified its reference set with your traffic. These are dry-run numbers
-against a synthetic quality model, not live benchmark claims — run
-`relay eval` yourself; the harness is in the box.
+relay ships a difficulty-based smart router (easy traffic → your cheap chain,
+hard → your frontier chain) with an eval harness — and the harness's own
+verdict is that **you should beat our baseline on your traffic before trusting
+it**, so smart routing is off by default:
 
-Prior art, credited: relay's tier-2 KNN is the same family as
-[RouteLLM](https://arxiv.org/abs/2406.18665) (Ong et al.) run locally over your
-own traffic; learned matrix-factorization and
-[graph routers](https://arxiv.org/abs/2410.03834) (GraphRouter, Feng et al.,
-ICLR 2025) are on the roadmap, not in v1.
+```bash
+relay eval                          # dry-run: the committed sets, your candidates
+relay eval --live-judge --dry-run   # real completions, judge-scored; prints spend first
+```
+
+What our harness measured on the held-out set v2 (classifier frozen, synthetic
+quality labels — see `assets/eval/README.md` for what that means):
+
+| Policy | Cost vs always-frontier | Quality delta | Verdict at 0.02 tolerance |
+|---|---|---|---|
+| tier 1 (lexical) | −45% | **−0.071** | fail — over-routes hard traffic to cheap |
+| tier 2 (embedding KNN, cold-start seed refs) | −21% | −0.022 | near miss |
+| static-mid | −82% | −0.080 | fail |
+
+(On the v1 set tier 1 had "passed" at −0.017 — but its weights were calibrated
+on v1, so that number was in-sample flattery. The held-out run is the honest
+one; v1 is relegated to being the calibration set. Full tables:
+`assets/eval/`.)
+
+Enabling it is one config block — with an explicit tier, because nothing
+routes your traffic by silent default:
+
+```yaml
+providers:
+  gemini:
+    api_key: ["${GEMINI_API_KEY}"]
+  anthropic:
+    api_key: ["${ANTHROPIC_API_KEY}"]
+  ollama:
+    type: ollama
+
+routing:
+  default: smart
+  smart:
+    easy: gemini/gemini-3.1-flash-lite
+    hard: anthropic/claude-sonnet-5
+    embeddings: ollama/nomic-embed-text   # selects the knn tier (documented path)
+    # tier: lexical                       # experimental: failed the held-out gate
+```
+
+Tier 2 (KNN) **gets better on YOUR traffic via `relay train`** — implicit
+signals, optional replay+judge (always estimates spend and asks first), and
+`POST /v1/feedback` scores grow its reference set; then measure your own
+crossover with `relay eval --refs ~/.relay/smart_refs.json`. Every smart
+decision logs its evidence (`knn: 5 neighbors [seed-math-03 d=0.75 sim=0.95;
+…]`) — "the model felt like it" is not an accepted routing reason. A remote
+embedder requires `allow_remote_embeddings: true`; routing never silently
+ships prompts anywhere.
+
+## Compare models on your own prompts
+
+```bash
+relay compare --models gemini/gemini-3.1-flash-lite,anthropic/claude-haiku-4-5,groq/llama-3.3-70b \
+  --html compare.html "Explain CRDTs to a backend engineer in five sentences."
+```
+
+One table (and a shareable HTML report): output, cost, latency, and TTFT side
+by side, through the same adapters that serve your traffic.
+[docs/models-landscape.md](docs/models-landscape.md) is the dated
+"which model for what" companion.
 
 ## Observability
 
-Every request is logged to a local SQLite database (metadata only by default —
-prompt logging is opt-in, three-tier). `/dashboard` serves spend by day, latency
-percentiles, and recent routing decisions with human-readable reasons.
-`/metrics` exposes Prometheus counters and histograms, including cost and cache
-hit rates. Models missing from the pricing registry are surfaced as **unpriced**
-(never silently $0) in the dashboard, `relay stats`, and
-`relay_unpriced_requests_total`.
+Every request logs to local SQLite with privacy tiers (`off` by default —
+metadata only; `embeddings` stores query vectors, never text; `full` is an
+explicit choice). `/dashboard` shows spend by day, latency percentiles, and
+recent routing decisions with human-readable reasons. `/metrics` is
+Prometheus. Models missing from the pricing registry surface as **unpriced**
+— never a silent $0.
+
+## Security
+
+Loopback by default; a non-loopback bind without inbound API keys **refuses
+to start**. No telemetry. See [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) — the adapter-authoring guide is there;
+an OpenAI-compatible provider is a one-entry preset. Design changes get
+argued in [DESIGN.md](DESIGN.md) §0 first; it's how the doc stays true.

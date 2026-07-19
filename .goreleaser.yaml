@@ -1,0 +1,67 @@
+# goreleaser config — cross-platform static builds (CGO_ENABLED=0 always;
+# modernc.org/sqlite keeps it pure Go). windows/arm64 included: it is a
+# dogfood platform for this project.
+version: 2
+
+project_name: relay
+
+builds:
+  - main: ./cmd/relay
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, NOTICE, README.md]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  filters:
+    exclude: ["^chore", "^docs"]
+
+release:
+  draft: true # a human presses publish
+
+brews:
+  - repository:
+      owner: llmrelay
+      name: homebrew-tap
+    directory: Formula
+    homepage: https://github.com/llmrelay/relay
+    description: Self-hosted LLM gateway and model router. One static binary, zero telemetry.
+    license: Apache-2.0
+    test: |
+      system "#{bin}/relay", "version"
+
+dockers:
+  - image_templates:
+      - ghcr.io/llmrelay/relay:{{ .Version }}-amd64
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates: ["--platform=linux/amd64"]
+  - image_templates:
+      - ghcr.io/llmrelay/relay:{{ .Version }}-arm64
+    use: buildx
+    dockerfile: Dockerfile
+    goarch: arm64
+    build_flag_templates: ["--platform=linux/arm64"]
+
+docker_manifests:
+  - name_template: ghcr.io/llmrelay/relay:{{ .Version }}
+    image_templates:
+      - ghcr.io/llmrelay/relay:{{ .Version }}-amd64
+      - ghcr.io/llmrelay/relay:{{ .Version }}-arm64
+  - name_template: ghcr.io/llmrelay/relay:latest
+    image_templates:
+      - ghcr.io/llmrelay/relay:{{ .Version }}-amd64
+      - ghcr.io/llmrelay/relay:{{ .Version }}-arm64

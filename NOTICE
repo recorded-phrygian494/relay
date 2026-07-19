@@ -1,0 +1,14 @@
+relay — self-hosted LLM gateway and model router
+Copyright 2026 The relay authors
+
+Licensed under the Apache License, Version 2.0.
+
+This product includes software developed by third parties under their own
+licenses (see go.mod for the full dependency list):
+- prometheus/client_golang (Apache-2.0)
+- modernc.org/sqlite (BSD-3-Clause)
+- gopkg.in/yaml.v3 (Apache-2.0 / MIT)
+
+Routing prior art credited in DESIGN.md §13:
+- RouteLLM: Learning to Route LLMs with Preference Data (Ong et al., arXiv:2406.18665)
+- GraphRouter: A Graph-based Router for LLM Selections (Feng, Shen & You, ICLR 2025, arXiv:2410.03834)
