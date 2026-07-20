@@ -102,7 +102,7 @@ func Open(path string) (*Store, error) {
 	// modernc/sqlite serializes writes; one connection avoids lock churn.
 	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(schema); err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, fmt.Errorf("applying schema: %w", err)
 	}
 	s := &Store{db: db, ch: make(chan Record, 1024), done: make(chan struct{})}

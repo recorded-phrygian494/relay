@@ -185,7 +185,7 @@ func ToAnthropicRequest(r *core.Request) (*anthropic.MessagesRequest, error) {
 				if !ok {
 					return nil, fmt.Errorf("messages[%d]: non-text system content", i)
 				}
-				system = append(system, core.SystemPart{Text: tp.Text, Ext: tp.Ext})
+				system = append(system, core.SystemPart(tp))
 			}
 		case core.RoleUser, core.RoleAssistant, core.RoleTool:
 			msg, err := toAnthropicMessage(m)

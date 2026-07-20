@@ -157,7 +157,7 @@ func retryable(err error) bool {
 
 // Complete walks the chain for a non-streaming request.
 func (e *Executor) Complete(ctx context.Context, req *core.Request, candidates []router.Candidate, onAttempt OnAttempt) (*core.Response, error) {
-	var last error = ErrNoCandidate
+	var last = ErrNoCandidate
 	for _, cand := range candidates {
 		p, ok := e.Lookup(cand.Provider)
 		if !ok {
@@ -188,7 +188,7 @@ func (e *Executor) Stream(ctx context.Context, req *core.Request, candidates []r
 	if ttft <= 0 {
 		ttft = DefaultTTFT
 	}
-	var last error = ErrNoCandidate
+	var last = ErrNoCandidate
 	for _, cand := range candidates {
 		p, ok := e.Lookup(cand.Provider)
 		if !ok {

@@ -1,0 +1,12 @@
+version: "2"
+
+linters:
+  exclusions:
+    rules:
+      # Deferred Close on read/cleanup paths is idiomatic Go; flagging it
+      # adds churn, not safety. Non-deferred error returns stay enforced.
+      - linters: [errcheck]
+        source: 'defer .*\.Close\(\)'
+      # Tests routinely discard Close/Copy errors on scaffolding.
+      - linters: [errcheck]
+        path: '_test\.go$'
