@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "llmrelay"
+version = "0.0.1"
+description = "Name placeholder for relay, the self-hosted LLM gateway and model router. The real project lives at https://github.com/llmrelay/relay."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/llmrelay/relay"
+Repository = "https://github.com/llmrelay/relay"

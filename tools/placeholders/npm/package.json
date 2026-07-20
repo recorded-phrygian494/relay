@@ -1,0 +1,14 @@
+{
+  "name": "llmrelay",
+  "version": "0.0.1",
+  "description": "Name placeholder for relay, the self-hosted LLM gateway and model router. The real project lives at https://github.com/llmrelay/relay — install the binary from there.",
+  "homepage": "https://github.com/llmrelay/relay",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/llmrelay/relay.git"
+  },
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "files": ["index.js", "README.md"],
+  "keywords": ["llm", "gateway", "router", "openai", "anthropic", "proxy"]
+}

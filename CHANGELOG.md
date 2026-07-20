@@ -3,7 +3,7 @@
 All notable changes to relay. Format loosely follows Keep a Changelog;
 versions follow SemVer once tagged.
 
-## [Unreleased] — v0.1.0 (launch candidate)
+## [0.1.0] — 2026-07-20
 
 ### Added
 - OpenAI (`/v1/chat/completions`) and Anthropic (`/v1/messages`,
@@ -28,7 +28,16 @@ versions follow SemVer once tagged.
 - Zero telemetry, loopback-by-default with refuse-to-start on unauthenticated
   non-loopback binds.
 
+### Decided by measurement
+- Smart routing ships **off-by-default**: the held-out live-judged eval
+  (assets/eval/verdict-v2-live-judged-2026-07-20.json) did not prove any
+  smart tier beats static routing on cost at equal quality; static-cheap
+  beat the frontier baseline outright on that set. Enabling requires an
+  explicit tier; the README leads with the table.
+
 ### Known gaps (tracked)
-- OpenAI Responses API (`/v1/responses`): not yet; fast-follow v1.1.
-- Semantic cache, log retention, smart-routing `translate.strictness`:
-  reserved config keys, documented as such.
+- OpenAI Responses API (`/v1/responses`): not yet; v1.1 tracking issue
+  filed at launch (binding, DESIGN §0.5).
+- darwin binaries: built, not yet smoke-tested on Apple hardware.
+- Semantic cache, log retention, `translate.strictness`: reserved config
+  keys, documented as such.

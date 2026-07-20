@@ -1,0 +1,10 @@
+relay v0.1.0 — first public release
+
+Self-hosted LLM gateway + model router. One static binary, both OpenAI and
+Anthropic dialects inbound, any provider outbound, zero telemetry.
+
+Smart routing ships off-by-default: our own live-judged eval could not prove
+it beats static baselines on cost at equal quality, and the README says so
+with the full table. Measured gateway overhead ~0.18 ms p50 (CI-gated).
+
+Full notes: docs/release/v0.1.0-notes.md
