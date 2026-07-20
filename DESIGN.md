@@ -113,11 +113,13 @@ re-parsed deterministically (no completions or judge calls rerun; the
 corrections log inside the verdict JSON preserves every raw reply). The
 parser now applies the same deterministic ladder, and future unparseable
 judgements are recorded as *missing* (excluded from means, valid N
-disclosed), never zero-scored. Corrected table (valid N = 49 everywhere):
-static-cheap +0.016 quality at −98% cost, static-mid +0.004 at −69%,
-**smart-tier1 −0.020 at −50% — FAIL, unchanged by the correction** (its two
-affected pairs were shared with the baseline), smart-tier2 −0.006 at −17%
-(within tolerance). On this 49-prompt, 700-output-token, single-judge
+disclosed), never zero-scored. Corrected table (valid N = 49 everywhere; values rounded — gate decisions
+use the unrounded asset values, and the acceptance rule is *inclusive*:
+mean ≥ baseline − 0.02, so exactly −0.0200 would pass): static-cheap
++0.0163 quality at −98% cost, static-mid +0.0041 at −69%, **smart-tier1
+−0.0204 at −50% — FAIL, strictly below the bound (unrounded −0.020408…,
+exactly −1/49), unchanged by the correction** (its two affected pairs were
+shared with the baseline), smart-tier2 −0.0061 at −17% (within tolerance). On this 49-prompt, 700-output-token, single-judge
 evaluation the static-cheap baseline received a higher judged score than the
 configured frontier baseline — a result specific to these models, prompts,
 token cap, and judge, not a general model-quality claim. **Off-by-default is

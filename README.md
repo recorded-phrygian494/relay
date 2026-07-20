@@ -103,13 +103,18 @@ verdict number in commentary and were re-parsed deterministically from the
 preserved raw replies rather than scored 0 — the corrections log inside the
 verdict JSON records each one):
 
-| Policy | Cost vs always-frontier | Judged quality delta | Verdict at 0.02 tolerance |
+| Policy | Cost vs always-frontier | Judged quality delta | Verdict at −0.0200 tolerance (inclusive) |
 |---|---|---|---|
-| static-cheap / cheapest | −98% | +0.016 | passes |
-| static-mid | −69% | +0.004 | passes |
-| tier 1 (lexical) | −50% | **−0.020** | **fail** — just outside tolerance |
-| tier 2 (embedding KNN, cold-start) | −17% | −0.006 | passes within tolerance; opt-in for v0.1.0 |
+| static-cheap / cheapest | −98% | +0.0163 | passes |
+| static-mid | −69% | +0.0041 | passes |
+| tier 1 (lexical) | −50% | **−0.0204** | **fail** — strictly below the bound |
+| tier 2 (embedding KNN, cold-start) | −17% | −0.0061 | passes within tolerance; opt-in for v0.1.0 |
 | static-frontier (baseline) | — | — | — |
+
+Values are shown rounded. Gate decisions use the unrounded values from the
+committed verdict asset (a delta of exactly −0.0200 would pass — the rule is
+inclusive; tier 1's unrounded delta is −0.020408…, exactly −1/49, strictly
+below it). A CI test asserts this table matches the asset at full precision.
 
 On this 49-prompt, 700-output-token, single-judge evaluation, the static-cheap
 baseline received a higher judged score than the configured frontier baseline.
