@@ -99,10 +99,24 @@ per the gate's own rule that nothing routes by default without proof): smart
 routing ships off-by-default.** Enabling it requires an explicit
 `routing.default: smart` plus an explicit tier: `knn` is the documented tier
 (auto-selected when `routing.smart.embeddings` is set), `lexical` is available
-but labeled experimental. The README says exactly this, and points users at
-`relay eval` to beat the baseline on their own traffic before trusting any
-router. The live-judged v2 run remains the standard to (re)claim default-on;
-it needs funded provider accounts.
+but labeled experimental.
+
+**GATE OUTCOME v2 LIVE-JUDGED (2026-07-20, standing verdict):** with funded
+accounts the definitive run completed — 146/147 (row × model) pairs measured
+(judge `claude-opus-4-8`; mid substituted to `claude-sonnet-5` because
+gemini-3.5-flash's free tier caps at 20/day; completions capped at 700
+tokens; spend $1.44). **Tier 1 failed** at −0.020 judged quality (−50% cost),
+just outside the 0.02 tolerance — the harness's boundary arithmetic decides,
+not sympathy. Tier 2 landed within tolerance (−0.006, −17% cost) but the run's
+headline neuters any default-on claim: **static-cheap beat the frontier
+baseline outright** (+0.037 judged quality at −98% cost) on this set. When
+"always cheapest" wins the measured table, no router earns default-on by
+beating a baseline it cannot even match. Recorded caveats: single judge, the
+token cap penalizes long-form frontier answers on proof-style rows, 49
+prompts, one judge parse failure scored 0 against static-mid.
+**Off-by-default is the standing outcome; README leads with the live-judged
+table and the "beat the baselines on your own traffic" instruction.** Verdict
+JSON: assets/eval/verdict-v2-live-judged-2026-07-20.json.
 
 ### 0.4 "Train from your own traffic" has a labeling problem — be honest about the loop
 

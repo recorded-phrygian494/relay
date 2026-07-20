@@ -1,106 +1,112 @@
 # Models landscape — which model for what
 
-Working notes in the spirit of `quirks.md`: factual, dated, no hype. Each entry
-says what a model family is actually good for through relay, and what to watch.
-Prices live in `assets/pricing.json` (cited there); this file is about fit.
-Dates mark when an entry was last reviewed — trust nothing undated.
+Working notes in the spirit of `quirks.md`: only claims backed by relay's
+presets, its recorded corpus, or a cited dated source. Prices live in
+`assets/pricing.json` (sources cited there); this file is about fit. Dates mark
+when an entry was last reviewed — trust nothing undated. For anything not
+listed here, `relay compare --models a,b,c "your prompt"` answers the question
+on your own data in thirty seconds, with real latency and cost attached.
 
-> Maintainer note: seeded 2026-07-19 from the providers relay presets. Entries
-> are starting points, expected to be edited by humans with production
-> experience per provider. `relay compare` is the fastest way to check any
-> claim here against your own prompts.
+> Maintainer note: seeded 2026-07-20 from what the presets and recorded
+> fixtures actually establish. Expected to grow through PRs from people with
+> production experience per provider.
 
 ## First-party (native dialects)
 
-### Anthropic (`anthropic`) — reviewed 2026-07-19
-- **claude-fable-5** — frontier tier; strongest reasoning/coding in the family.
-  The §0.3 eval's frontier baseline. Priced accordingly; route only hard
-  traffic here.
-- **claude-opus-4-8 / claude-sonnet-5** — mid-frontier work; opus-4-8 is
-  relay's default eval judge (strong, and not an eval candidate).
-- **claude-haiku-4-5** — fast/cheap tier with tool use good enough for real
-  agent loops; a solid `hard`-chain budget alternative.
-- Watch: no embeddings API (relay answers an honest 404); `/v1/messages`
-  passthrough is relay's native path, so block-level `cache_control` survives.
+### Anthropic (`anthropic`) — reviewed 2026-07-20
+- Model tiers in relay's registry: `claude-fable-5` (frontier; the eval
+  harness's frontier baseline), `claude-opus-4-8` (relay's default eval judge
+  — strong, and not an eval candidate), `claude-sonnet-5`, `claude-haiku-4-5`
+  (the cheap tier; served relay's own smart-routing hard chain in phase-4
+  live verification).
+- No embeddings API — relay answers `/v1/embeddings` for it with an honest
+  404 (recorded behavior).
+- Anthropic-dialect passthrough is native, so block-level `cache_control`
+  survives (DESIGN §5 corpus).
 
-### Google Gemini (`gemini`) — reviewed 2026-07-19
-- **gemini-3.5-flash / gemini-3.1-pro-preview** — strong mid/frontier tiers;
-  huge context (1,048,576 tokens).
-- **gemini-3.1-flash-lite** — the cheap workhorse of relay's own eval runs;
-  excellent $/quality on easy traffic.
-- **gemini-embedding-001** — embeddings via the same key.
-- Watch: free-tier quotas are *per model per day*; Gemini 3 thought signatures
-  degrade multi-turn tool use through a cross-dialect gateway (documented:
-  `quirks.md`, DESIGN §0.7 — relay flags affected models and warns).
+### Google Gemini (`gemini`) — reviewed 2026-07-20
+- Registry tiers: `gemini-3.5-flash`, `gemini-3.1-pro-preview` (both
+  1,048,576-token input windows per Google's model pages, fetched
+  2026-07-18), `gemini-3.1-flash-lite` (the cheap band in relay's committed
+  eval runs), `gemini-embedding-001` for embeddings.
+- Free-tier quotas are per model per day and can be small — observed
+  2026-07-19: `gemini-3.5-flash` capped at 20 requests/day, which aborted a
+  49-request eval run; `flash-lite` limits are far higher (observed).
+- Gemini 3 thought signatures degrade multi-turn tool use through a
+  cross-dialect gateway — recorded fixture, `quirks.md`, DESIGN §0.7; relay
+  flags affected models and warns.
 
-### OpenAI (`openai`) — reviewed 2026-07-19
-- **gpt-5 family** — frontier/mid tiers; `gpt-5-nano`/`gpt-5-mini` are
-  competitive cheap tiers. **gpt-4.1 family** for long context.
-- Watch: newer SDKs default to the Responses API, which relay does not speak
-  yet (Chat Completions: full; Responses: tracked fast-follow).
+### OpenAI (`openai`) — reviewed 2026-07-20
+- Registry tiers: `gpt-5` family (incl. `-mini`, `-nano`), `gpt-4.1` family,
+  `gpt-4o` family, `o3`/`o4-mini`.
+- Newer OpenAI SDKs default to the Responses API, which relay does not speak
+  yet (Chat Completions: full; Responses: tracked v1.1 fast-follow — the
+  compatibility table is binding, DESIGN §0.5).
 
-### Ollama (`ollama`) — reviewed 2026-07-19
-- Local, free, private. `nomic-embed-text` powers relay's tier-2 routing and
-  the embeddings log tier. Good chat models for the `sensitive-local` pattern;
-  quality tracks the open-weight state of the art at the size you can run.
+### Ollama (`ollama`) — reviewed 2026-07-20
+- Local, free, no key; relay auto-discovers models via `/api/tags`.
+- `nomic-embed-text` powers relay's tier-2 routing and the embeddings log
+  tier in relay's own verification runs.
+- The `sensitive-local` pattern (see `examples/`) exists because tokens that
+  never leave the machine is a property no hosted tier can match.
 
 ## OpenAI-compatible presets
 
-### Groq (`groq`) — reviewed 2026-07-19
-Open-weight models (Llama family and friends) served unusually fast — often
-the best TTFT on the board. Good `fast`/`cheap` alias material. Watch: model
-list rotates; pin exact ids in aliases.
+What each preset factually is (base URL, key env, gotchas) lives in
+`internal/provider/openaicompat/profiles.go` and prints via `relay init`.
+Notes below only where relay has something verifiable to add.
 
-### DeepSeek (`deepseek`) — reviewed 2026-07-19
-`deepseek-chat` and reasoning variants: strong quality per dollar, especially
-code/math. Watch: prepaid balance required; API is mainland-hosted — check
-your data-residency requirements before routing sensitive traffic.
+### Groq (`groq`) — reviewed 2026-07-20
+Serves open-weight models (Llama family and others) on custom hardware.
+<!-- REVIEW: opinionated, from general reputation not our measurements -->
+Often the best TTFT on the board — verify with `relay compare` on your prompts.
 
-### Mistral (`mistral`) — reviewed 2026-07-19
-Solid European option (data residency); mid-tier models plus capable small
-ones. Free experimentation tier exists.
+### DeepSeek (`deepseek`) — reviewed 2026-07-20
+Prepaid balance required before requests succeed (onboarding note, profiles).
+API is mainland-hosted; check data-residency requirements before routing
+sensitive traffic there.
+<!-- REVIEW: opinionated, from general reputation not our measurements -->
+Reputation for strong code/math quality per dollar.
 
-### Together / Fireworks (`together`, `fireworks`) — reviewed 2026-07-19
-Broad open-weight catalogs (Llama, Qwen, DeepSeek re-hosted) with per-token
-pricing; useful to A/B the same open model across hosts with `relay compare`.
+### Mistral (`mistral`) — reviewed 2026-07-20
+EU-based provider (data-residency relevant); free experimentation tier with
+phone verification (onboarding note).
 
-### xAI (`xai`) — reviewed 2026-07-19
-Grok models; competitive frontier/mid tiers with live-data flavor. Watch:
-pricing and ids move quickly; keep the registry override fresh.
+### Together / Fireworks (`together`, `fireworks`) — reviewed 2026-07-20
+Broad open-weight catalogs; both host many of the same models, which makes
+them natural `relay compare` A/B pairs and fallback-chain partners.
 
-### Cerebras (`cerebras`) — reviewed 2026-07-19
-Extreme tokens/sec on a small open-weight catalog — TTFT/throughput demos and
-latency-sensitive easy traffic.
+### xAI (`xai`), Cerebras (`cerebras`) — reviewed 2026-07-20
+Presets verified for base URL/key convention. Cerebras serves a small
+open-weight catalog on wafer-scale hardware.
+<!-- REVIEW: opinionated, from general reputation not our measurements -->
+Cerebras's tokens/sec is the draw; catalog breadth is not.
 
-### Moonshot / Kimi (`moonshot`) — reviewed 2026-07-19
-Kimi models, strong long-context work. Watch: .ai vs .cn consoles are separate
-accounts with separate keys.
+### Moonshot / Kimi (`moonshot`) — reviewed 2026-07-20
+`.ai` (international) vs `.cn` (mainland) consoles are separate accounts with
+non-interchangeable keys (onboarding note).
 
-### Alibaba Qwen via DashScope (`qwen`) — reviewed 2026-07-19
-Qwen models: broad size range, strong multilingual and coding. Watch: needs an
-Alibaba Cloud account; mainland vs international endpoints differ (set
-`base_url` if your account is on `dashscope-intl`).
+### Alibaba Qwen via DashScope (`qwen`) — reviewed 2026-07-20
+Requires an Alibaba Cloud account. Mainland vs international endpoints differ
+(`dashscope-intl.aliyuncs.com` — set `base_url` explicitly if your account is
+international). Qwen models span a wide size range.
 
-### Zhipu GLM (`zhipu`) — reviewed 2026-07-19
-GLM models via bigmodel.cn; competitive Chinese-language and coding tiers.
-Watch: phone-first mainland signup flow.
+### Zhipu GLM (`zhipu`) — reviewed 2026-07-20
+GLM models via bigmodel.cn; account flow is phone-number-first (mainland).
 
-### MiniMax (`minimax`) — reviewed 2026-07-19
-MiniMax models incl. long-context and voice-adjacent lines. Watch: .io vs
-mainland platforms are separate accounts.
+### MiniMax (`minimax`) — reviewed 2026-07-20
+`.io` (international) vs mainland platforms are separate accounts.
 
-### OpenRouter (`openrouter`) — reviewed 2026-07-19
-Not a model vendor — an aggregator. One key fronts many providers. Useful for
-discovery before committing to direct keys (direct is cheaper at volume).
-Routing through relay *and* OpenRouter stacks two gateways; do it consciously.
+### OpenRouter (`openrouter`) — reviewed 2026-07-20
+An aggregator, not a model vendor: one key fronts many providers. Routing
+through relay *and* OpenRouter stacks two gateways — do it consciously (e.g.
+for discovery before getting direct keys).
 
-## Patterns that keep showing up
+## What relay's own harness has established
 
-- **Easy/hard split beats model loyalty.** The eval harness keeps showing the
-  same shape: cheap models are fine for most traffic and collapse on the hard
-  tail. That is the entire premise of `routing.default: smart`.
-- **Sensitive-local / bulk-cheap:** alias sensitive traffic to `ollama/*`,
-  bulk traffic to a cheap hosted tier; see `examples/`.
-- **Verify locally, always:** `relay compare --models a,b,c "your real prompt"`
-  answers most "which model" questions in thirty seconds, on your data, with
-  real latency and cost attached.
+- On both committed eval sets, cheap models track the frontier on trivial
+  traffic and fall off steeply with difficulty — the premise of routing at
+  all. The magnitude is synthetic-label-dependent; see `assets/eval/README.md`
+  for the honest caveats and `relay eval --live-judge` for measured quality.
+- No smart tier has yet proven cost-at-equal-quality on held-out data, which
+  is why smart routing ships off-by-default (DESIGN §0.3, gate outcome v2).

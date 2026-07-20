@@ -94,19 +94,31 @@ relay eval                          # dry-run: the committed sets, your candidat
 relay eval --live-judge --dry-run   # real completions, judge-scored; prints spend first
 ```
 
-What our harness measured on the held-out set v2 (classifier frozen, synthetic
-quality labels — see `assets/eval/README.md` for what that means):
+What our harness measured on the held-out set v2, **live-judged** — real
+completions from each routed model, quality scored by `claude-opus-4-8`
+(2026-07-20; 49 prompts, completions capped at 700 tokens; mid band is
+`claude-sonnet-5` because Gemini's free tier caps `gemini-3.5-flash` at
+20 requests/day; one judge parse failure scored 0 against static-mid):
 
-| Policy | Cost vs always-frontier | Quality delta | Verdict at 0.02 tolerance |
+| Policy | Cost vs always-frontier | Judged quality delta | Verdict at 0.02 tolerance |
 |---|---|---|---|
-| tier 1 (lexical) | −45% | **−0.071** | fail — over-routes hard traffic to cheap |
-| tier 2 (embedding KNN, cold-start seed refs) | −21% | −0.022 | near miss |
-| static-mid | −82% | −0.080 | fail |
+| static-cheap / cheapest | −98% | **+0.037** | beats the baseline outright |
+| static-mid | −69% | −0.024 | fail |
+| tier 1 (lexical) | −50% | −0.020 | **fail** — just outside tolerance |
+| tier 2 (embedding KNN, cold-start) | −17% | −0.006 | within tolerance, but see below |
+| static-frontier (baseline) | — | — | — |
 
-(On the v1 set tier 1 had "passed" at −0.017 — but its weights were calibrated
-on v1, so that number was in-sample flattery. The held-out run is the honest
-one; v1 is relegated to being the calibration set. Full tables:
-`assets/eval/`.)
+Read that top line again: on this 49-prompt set, **always-cheapest beat the
+frontier baseline on judged quality**. Caveats apply — one judge, a token cap
+that penalizes long-form frontier answers, a small set — but the honest
+conclusion is the one relay ships with: routing cleverness must earn its keep
+against embarrassingly strong dumb baselines, *measured on your traffic*. No
+smart tier cleared that bar here, so none is on by default.
+
+(History: on the v1 set tier 1 had "passed" synthetic at −0.017 — in-sample
+flattery, since its weights were calibrated on v1. On v2 synthetic labels it
+failed at −0.071. v1 is the calibration set; v2 live-judged is the standing
+verdict. Full tables: `assets/eval/`.)
 
 Enabling it is one config block — with an explicit tier, because nothing
 routes your traffic by silent default:
