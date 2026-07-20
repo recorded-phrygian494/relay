@@ -29,11 +29,14 @@ versions follow SemVer once tagged.
   non-loopback binds.
 
 ### Decided by measurement
-- Smart routing ships **off-by-default**: the held-out live-judged eval
-  (assets/eval/verdict-v2-live-judged-2026-07-20.json) did not prove any
-  smart tier beats static routing on cost at equal quality; static-cheap
-  beat the frontier baseline outright on that set. Enabling requires an
-  explicit tier; the README leads with the table.
+- Smart routing ships **off-by-default**: on the held-out live-judged eval
+  (assets/eval/verdict-v2-live-judged-2026-07-20.json, corrections log
+  included) tier 1 failed the cost-at-equal-quality gate and tier 2 passed
+  within tolerance but stays opt-in. On that specific 49-prompt,
+  single-judge, token-capped run the static-cheap baseline out-scored the
+  configured frontier baseline — specific to those models/prompts/judge,
+  not a general claim. Enabling smart routing requires an explicit tier;
+  the README leads with the table.
 
 ### Known gaps (tracked)
 - OpenAI Responses API (`/v1/responses`): not yet; v1.1 tracking issue

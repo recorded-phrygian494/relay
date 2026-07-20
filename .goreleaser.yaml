@@ -31,11 +31,17 @@ changelog:
 
 release:
   draft: true # a human presses publish
+  prerelease: auto # -rc tags are marked prerelease automatically
 
 brews:
   - repository:
       owner: llmrelay
       name: homebrew-tap
+    # v0.1.0 launch order is binding: the formula is published only AFTER
+    # the final release is public (LAUNCH.md step 14) — goreleaser renders
+    # it into dist/homebrew/ and a human copies it to the tap. Flip to
+    # false once the repo is public and releases are routine.
+    skip_upload: true
     directory: Formula
     homepage: https://github.com/llmrelay/relay
     description: Self-hosted LLM gateway and model router. One static binary, zero telemetry.
