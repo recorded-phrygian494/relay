@@ -16,5 +16,6 @@ tested installer** that:
 - reports a clear error on unsupported platforms,
 - and is covered by installation tests in CI.
 
-Until then, the supported distribution channels are **GitHub Releases,
-Homebrew, and Docker**.
+Until then, the supported distribution channels are **GitHub Releases and
+Homebrew** (plus a tested Dockerfile in the repo to build yourself; a
+published image is future work alongside these installers).

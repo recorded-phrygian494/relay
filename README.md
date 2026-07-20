@@ -15,7 +15,7 @@ plain curl ─────┘   route · failover · log · cache └─ your lo
 ## 60-second quickstart
 
 ```bash
-# 1. install (or: docker run ghcr.io/llmrelay/relay, or download a release binary)
+# 1. install (or download a release binary; a tested Dockerfile is included to build yourself)
 brew install llmrelay/tap/relay
 
 # 2. keys you already have, zero config

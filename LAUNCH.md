@@ -4,7 +4,9 @@ The final public release **cannot** happen before the darwin/arm64 artifact
 passes its hardware test on the Mac mini (steps 9–13). Do not publish final
 `v0.1.0` first and use the public release as the initial Mac test.
 
-Distribution channels for v0.1.0: **GitHub Releases, Homebrew, Docker**.
+Distribution channels for v0.1.0: **GitHub Releases and Homebrew** (the
+tested Dockerfile ships in-repo for self-builds; a published image needs
+registry credentials and is deliberately out of v0.1.0 scope).
 (npm/PyPI placeholders were removed from the launch — see
 `future/package-installers/README.md` for the bar they must meet first.)
 
