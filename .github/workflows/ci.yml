@@ -20,7 +20,7 @@ jobs:
       - name: vet
         run: go vet ./...
       - name: lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           version: latest
       - name: unit + integration (fixtures only, never live APIs)
