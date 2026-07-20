@@ -58,15 +58,13 @@ Notes below only where relay has something verifiable to add.
 
 ### Groq (`groq`) — reviewed 2026-07-20
 Serves open-weight models (Llama family and others) on custom hardware.
-<!-- REVIEW: opinionated, from general reputation not our measurements -->
-Often the best TTFT on the board — verify with `relay compare` on your prompts.
 
 ### DeepSeek (`deepseek`) — reviewed 2026-07-20
 Prepaid balance required before requests succeed (onboarding note, profiles).
 API is mainland-hosted; check data-residency requirements before routing
-sensitive traffic there.
-<!-- REVIEW: opinionated, from general reputation not our measurements -->
-Reputation for strong code/math quality per dollar.
+sensitive traffic there. The bundled registry records comparatively low
+per-token pricing as of 2026-07-18; evaluate quality on your workload with
+`relay compare`.
 
 ### Mistral (`mistral`) — reviewed 2026-07-20
 EU-based provider (data-residency relevant); free experimentation tier with
@@ -77,10 +75,8 @@ Broad open-weight catalogs; both host many of the same models, which makes
 them natural `relay compare` A/B pairs and fallback-chain partners.
 
 ### xAI (`xai`), Cerebras (`cerebras`) — reviewed 2026-07-20
-Presets verified for base URL/key convention. Cerebras serves a small
+Presets verified for base URL/key convention. Cerebras serves an
 open-weight catalog on wafer-scale hardware.
-<!-- REVIEW: opinionated, from general reputation not our measurements -->
-Cerebras's tokens/sec is the draw; catalog breadth is not.
 
 ### Moonshot / Kimi (`moonshot`) — reviewed 2026-07-20
 `.ai` (international) vs `.cn` (mainland) consoles are separate accounts with

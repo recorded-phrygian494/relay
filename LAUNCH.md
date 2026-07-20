@@ -13,22 +13,19 @@ Total: **~60–75 min** across two machines (this PC + the Mac mini).
 
 ---
 
-## 1. Resolve the three editorial markers — ~10 min, editorial judgement
+## 1. Editorial pass — DONE (nothing to do)
+
+The three editorial markers in `docs/models-landscape.md` were resolved per
+your decisions (commit `docs(models): remove unsupported provider claims`):
+Groq's latency claim deleted, DeepSeek's reputation line replaced with the
+registry-backed pricing statement dated from the pricing asset, Cerebras's
+judgement line deleted. Optional sanity check:
 
 ```powershell
-findstr /s /n "REVIEW:" docs\models-landscape.md
+git grep -n "REVIEW:" -- docs/
 ```
 
-Three `<!-- REVIEW: -->` markers (Groq TTFT reputation, DeepSeek
-quality-per-dollar reputation, Cerebras throughput). Keep, reword, or delete
-each — the final wording is yours; nothing else in the file is opinion.
-Delete the marker comments when done, then:
-
-```powershell
-cd C:\Users\faith\Router
-git add docs/models-landscape.md
-git commit -m "docs: editorial pass on models-landscape"
-```
+Expected: no output.
 
 ## 2. Create the GitHub org — web, ~2 min
 
