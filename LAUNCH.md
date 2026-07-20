@@ -193,8 +193,9 @@ Before publishing the notes, delete the darwin caveat line in them — the RC
 evidence replaced it. Now, in this order:
 
 ```powershell
-# make the repository public
+# make the repositories public (the tap was created private for the RC stage)
 gh repo edit llmrelay/relay --visibility public --accept-visibility-change-consequences
+gh repo edit llmrelay/homebrew-tap --visibility public --accept-visibility-change-consequences
 
 # publish the Homebrew formula (rendered by goreleaser, upload disabled by config)
 git clone https://github.com/llmrelay/homebrew-tap.git $env:TEMP\homebrew-tap
