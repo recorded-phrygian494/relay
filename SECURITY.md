@@ -2,9 +2,9 @@
 
 ## Reporting a vulnerability
 
-Email **security@llmrelay.dev** (or use GitHub's private vulnerability
-reporting on this repository). Please do not open public issues for
-exploitable problems. We aim to acknowledge within 72 hours.
+Use **GitHub's private vulnerability reporting** on this repository
+(Security tab → "Report a vulnerability"). Please do not open public issues
+for exploitable problems. We aim to acknowledge within 72 hours.
 
 ## Security posture (what relay promises)
 

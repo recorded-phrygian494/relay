@@ -134,10 +134,11 @@ Expected: `Package is at https://pypi.org/project/llmrelay/0.0.1/`.
 
 If you register the domain: easiest v1 is GitHub Pages redirect or just point
 the repo's homepage at it (`gh repo edit llmrelay/relay --homepage
-"https://llmrelay.dev"`). Also update `SECURITY.md`'s report address
-(security@llmrelay.dev) to a mailbox that actually exists — **until then,
-edit SECURITY.md to the GitHub private-vulnerability-reporting path only**,
-or enable it: repo → Settings → Security → "Private vulnerability reporting".
+"https://llmrelay.dev"`). SECURITY.md already leads with GitHub private
+vulnerability reporting — **enable it once the repo exists**: repo →
+Settings → Advanced Security → "Private vulnerability reporting" → Enable
+(~30 seconds). Add a security@ mailbox to SECURITY.md only when the domain
+and mail exist.
 
 ## 10. Post-launch quick checks — ~3 min
 
