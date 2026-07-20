@@ -101,22 +101,30 @@ routing ships off-by-default.** Enabling it requires an explicit
 (auto-selected when `routing.smart.embeddings` is set), `lexical` is available
 but labeled experimental.
 
-**GATE OUTCOME v2 LIVE-JUDGED (2026-07-20, standing verdict):** with funded
-accounts the definitive run completed — 146/147 (row × model) pairs measured
-(judge `claude-opus-4-8`; mid substituted to `claude-sonnet-5` because
-gemini-3.5-flash's free tier caps at 20/day; completions capped at 700
-tokens; spend $1.44). **Tier 1 failed** at −0.020 judged quality (−50% cost),
-just outside the 0.02 tolerance — the harness's boundary arithmetic decides,
-not sympathy. Tier 2 landed within tolerance (−0.006, −17% cost) but the run's
-headline neuters any default-on claim: **static-cheap beat the frontier
-baseline outright** (+0.037 judged quality at −98% cost) on this set. When
-"always cheapest" wins the measured table, no router earns default-on by
-beating a baseline it cannot even match. Recorded caveats: single judge, the
-token cap penalizes long-form frontier answers on proof-style rows, 49
-prompts, one judge parse failure scored 0 against static-mid.
-**Off-by-default is the standing outcome; README leads with the live-judged
-table and the "beat the baselines on your own traffic" instruction.** Verdict
-JSON: assets/eval/verdict-v2-live-judged-2026-07-20.json.
+**GATE OUTCOME v2 LIVE-JUDGED (2026-07-20, standing verdict; corrected the
+same day):** with funded accounts the definitive run completed — all 147
+(row × model) pairs measured (judge `claude-opus-4-8`; mid substituted to
+`claude-sonnet-5` because gemini-3.5-flash's free tier caps at 20/day;
+completions capped at 700 output tokens; spend $1.44). **Correction, same
+day:** 6/147 judge replies buried the verdict number in commentary and the
+original whole-string parser scored them 0 — an infrastructure failure, not
+a model-quality signal. Each raw reply ends with a standalone score and was
+re-parsed deterministically (no completions or judge calls rerun; the
+corrections log inside the verdict JSON preserves every raw reply). The
+parser now applies the same deterministic ladder, and future unparseable
+judgements are recorded as *missing* (excluded from means, valid N
+disclosed), never zero-scored. Corrected table (valid N = 49 everywhere):
+static-cheap +0.016 quality at −98% cost, static-mid +0.004 at −69%,
+**smart-tier1 −0.020 at −50% — FAIL, unchanged by the correction** (its two
+affected pairs were shared with the baseline), smart-tier2 −0.006 at −17%
+(within tolerance). On this 49-prompt, 700-output-token, single-judge
+evaluation the static-cheap baseline received a higher judged score than the
+configured frontier baseline — a result specific to these models, prompts,
+token cap, and judge, not a general model-quality claim. **Off-by-default is
+the standing outcome: tier 1 failed the held-out live gate; tier 2 passed
+within tolerance but ships opt-in for v0.1.0; users should evaluate routing
+on their own traffic.** Verdict JSON (with corrections log):
+assets/eval/verdict-v2-live-judged-2026-07-20.json.
 
 ### 0.4 "Train from your own traffic" has a labeling problem — be honest about the loop
 

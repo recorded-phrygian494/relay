@@ -83,12 +83,16 @@ type Decision struct {
 
 // PolicyResult aggregates one policy over the whole set.
 type PolicyResult struct {
-	Policy      string     `json:"policy"`
-	CostUSD     float64    `json:"cost_usd"`
-	MeanQuality float64    `json:"mean_quality"`
-	ByBand      map[Band]int `json:"routed_by_band"`
-	Errors      int        `json:"errors"`
-	Decisions   []Decision `json:"decisions"`
+	Policy      string       `json:"policy"`
+	CostUSD     float64      `json:"cost_usd"`
+	MeanQuality float64      `json:"mean_quality"`
+	// ValidN is how many decisions carry a valid quality observation
+	// (live-judged runs exclude missing judgements from the mean; 0 means
+	// "all of them" for dry runs, which never have missing labels).
+	ValidN    int          `json:"valid_n,omitempty"`
+	ByBand    map[Band]int `json:"routed_by_band"`
+	Errors    int          `json:"errors"`
+	Decisions []Decision   `json:"decisions"`
 }
 
 // EstTokensIn approximates prompt tokens for cost simulation (chars/4,

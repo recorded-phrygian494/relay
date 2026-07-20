@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -423,15 +424,39 @@ func judgeScore(ctx context.Context, p provider.Provider, model, prompt, answer 
 	if err != nil {
 		return 0, err
 	}
+	if score, ok := parseJudgeScore(out); ok {
+		return score, nil
+	}
+	return 0, fmt.Errorf("judge replied %q, not parseable as a 0-10 score", out)
+}
+
+var trailingScoreRe = regexp.MustCompile(`(?:^|[\s>*:.\x60])(\d+(?:\.\d+)?)\s*$`)
+
+// parseJudgeScore applies deterministic parsing attempts, in order: the
+// whole reply as a number, then a trailing standalone number — judges
+// sometimes prepend commentary despite "reply with ONLY the number"
+// (2026-07-20: 6/147 replies did exactly that and were wrongly scored 0
+// until corrected; see assets/eval verdict corrections log).
+func parseJudgeScore(out string) (float64, bool) {
+	trimmed := strings.TrimSpace(out)
 	var score float64
-	if _, err := fmt.Sscanf(strings.TrimSpace(out), "%g", &score); err != nil {
-		return 0, fmt.Errorf("judge replied %q, not a number", out)
+	if _, err := fmt.Sscanf(trimmed, "%g", &score); err == nil {
+		return clampScore(score), true
 	}
-	if score < 0 {
-		score = 0
+	if m := trailingScoreRe.FindStringSubmatch(trimmed); m != nil {
+		if _, err := fmt.Sscanf(m[1], "%g", &score); err == nil && score >= 0 && score <= 10 {
+			return clampScore(score), true
+		}
 	}
-	if score > 10 {
-		score = 10
+	return 0, false
+}
+
+func clampScore(s float64) float64 {
+	if s < 0 {
+		s = 0
 	}
-	return score / 10, nil
+	if s > 10 {
+		s = 10
+	}
+	return s / 10
 }

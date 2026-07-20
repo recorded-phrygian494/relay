@@ -30,6 +30,11 @@ type pairResult struct {
 	score   float64
 	costUSD float64
 	note    string
+	// missing: the judgement is unobtainable (unparseable after all
+	// deterministic attempts). Missing pairs are excluded from means and
+	// counted out of valid N — never scored 0 (a parse failure is not a
+	// model-quality signal).
+	missing bool
 }
 
 // livePairs collects the unique (row, model) pairs the dry-run decisions
@@ -190,9 +195,10 @@ func liveRejudge(ctx context.Context, rt *server.Runtime, reg *pricing.Registry,
 			defer mu.Unlock()
 			candSpend += cost
 			if err != nil {
-				pr.note = "judge failed: " + err.Error()
+				pr.note = "judgement missing: " + err.Error()
+				pr.missing = true
 				measured[pk] = pr
-				fmt.Printf("  [%d/%d] %s × %s: judge FAILED (%v)\n", done.Add(1), len(pairs), pk.rowID, pk.spec, err)
+				fmt.Printf("  [%d/%d] %s × %s: judgement MISSING (%v)\n", done.Add(1), len(pairs), pk.rowID, pk.spec, err)
 				return
 			}
 			judgeSpend += (float64(evalx.EstTokensIn(row.Prompt+answer))*jIn + 16*jOut) / 1e6
@@ -242,12 +248,18 @@ func liveRejudge(ctx context.Context, rt *server.Runtime, reg *pricing.Registry,
 			if m.note != "" {
 				nd.Reason = "[" + m.note + "] " + nd.Reason
 			}
-			jr.CostUSD += m.costUSD
-			jr.MeanQuality += m.score
 			jr.ByBand[d.Band]++
 			jr.Decisions = append(jr.Decisions, nd)
+			if m.missing {
+				// Excluded from the mean and from valid N; the decision
+				// row stays, labeled, so the gap is visible.
+				continue
+			}
+			jr.CostUSD += m.costUSD
+			jr.MeanQuality += m.score
 			n++
 		}
+		jr.ValidN = n
 		if n > 0 {
 			jr.MeanQuality /= float64(n)
 		}
